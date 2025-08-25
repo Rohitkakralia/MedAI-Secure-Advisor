@@ -26,12 +26,12 @@ const Chatbot = ({ useremail, onClose}) => {
   function handleClose() {
     setOpen(false);
   }
-  const calendlyLink = "https://calendly.com/rohitkakralia94/30min"; // Replace with your event link
+  const calendlyLink = "CALENDLY_LINK"; // Replace with your event link
 
 
 
   // Move API key to environment variable
-  const ai = new GoogleGenAI({ apiKey: "AIzaSyBRMnMgXiiuMcuhUawfkukuakBk9E8pwwI"});
+  const ai = new GoogleGenAI({ apiKey: "API_KEY"});
 
   useEffect(() => {
     fetch("/doctors.csv")
