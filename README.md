@@ -101,5 +101,5 @@ Rohit Kakralia
 
 LinkedIn: https://www.linkedin.com/in/rohit-kakralia-a35046251/
 
-GitHub: https://github.com/Rohitkakralia
-# MedAI-
+GitHub:https://github.com/Rohitkakralia
+# MedAI-Secure-Advisor
