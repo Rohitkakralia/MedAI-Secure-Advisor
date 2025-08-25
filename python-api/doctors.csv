@@ -1,0 +1,69 @@
+Specialty	Name	Address	Email	Mobile	Years_in_Practice	Hospital_Affiliation	
+Hematology	Dr. Rakesh Kapoor	22 Model Town, Ludhiana, India	rakesh.kapoor@example.com	+91 98765 11122	18	HematoCare Center, Ludhiana
+Internal Medicine	Dr. Anjali Verma	14 Civil Lines, Ludhiana, India	anjali.verma@example.com	+91 98123 99887	12	City Multispeciality Hosp.
+Pathology	Dr. Arvind Asthana	76 Green Park, Ludhiana, India	arvind.asthana@example.com	+91 99111 44567	20	Diagnostic Path Lab, Ludhiana
+Hematology	Dr. Priya Nanda	34 Mall Road, Ludhiana, India	priya.nanda@example.com	+91 98221 34567	10	Apollo Speciality Centre
+Internal Medicine	Dr. Suresh Malhotra	56 Tagore Nagar, Ludhiana, India	suresh.malhotra@example.com	+91 98987 22345	15	Fortis Hospital, Ludhiana
+Hematology/Oncology	Dr. Meena Bhatia	12 Rosewood Ave, Ludhiana, India	meena.bhatia@example.com	+91 98112 45678	13	
+Cardiology	Dr. Aarav Mehta	12 Rosewood Ave, Ludhiana, India	aarav.mehta@example.com	+91 98112 34567	12	City Heart Center		
+Neurology	Dr. Priya Singh	45 Green Park Rd, Ludhiana, India	priya.singh@example.com	+91 98765 43210	8	NeuroCare Hospital		
+Pediatrics	Dr. Rohan Sharma	120 Model Town, Ludhiana, India	rohan.sharma@example.com	+91 98001 23456	5	Sunshine Children's Clinic		
+Orthopedics	Dr. Neha Kaur	78 Civil Lines, Ludhiana, India	neha.kaur@example.com	+91 98123 98765	15	OrthoPlus Hospital		
+Dermatology	Dr. Amit Dhillon	32 Gandhi Bazar, Ludhiana, India	amit.dhillon@example.com	+91 98765 67890	10	DermaCare Clinic		
+ENT	Dr. Simran Gill	5 Industrial Area, Ludhiana, India	simran.gill@example.com	+91 98012 34567	7	ENT Specialists Hospital		
+Ophthalmology	Dr. Karan Verma	55 Pakhowal Rd, Ludhiana, India	karan.verma@example.com	+91 98198 76543	20	VisionEye Hospital		
+Psychiatry	Dr. Manisha Bedi	90 Sunder Nagar, Ludhiana, India	manisha.bedi@example.com	+91 98711 22334	4	MindWell Psychiatric Center		
+Gastroenterology	Dr. Vikram Chawla	16 Shastri Nagar, Ludhiana, India	vikram.chawla@example.com	+91 98134 55678	11	Digestive Care Hospital		
+Pulmonology	Dr. Anjali Rao	23 Ghumar Mandi, Ludhiana, India	anjali.rao@example.com	+91 98765 12321	9	LungWell Medical Center		
+Cardiology	Dr. Aarav Mehta	30 Rosewood Ave, Ludhiana, India	dr..aarav.mehta@example.com	+91 9812345 54321	1	City Heart Center		
+Neurology	Dr. Priya Singh	33 Green Park Rd, Ludhiana, India	dr..priya.singh@example.com	+91 9812346 54328	2	NeuroCare Hospital		
+Pediatrics	Dr. Rohan Sharma	36 Model Town, Ludhiana, India	dr..rohan.sharma@example.com	+91 9812347 54335	3	Sunshine Children's Clinic		
+Orthopedics	Dr. Neha Kaur	39 Civil Lines, Ludhiana, India	dr..neha.kaur@example.com	+91 9812348 54342	4	OrthoPlus Hospital		
+Dermatology	Dr. Amit Dhillon	42 Gandhi Bazar, Ludhiana, India	dr..amit.dhillon@example.com	+91 9812349 54349	5	DermaCare Clinic		
+ENT	Dr. Simran Gill	45 Industrial Area, Ludhiana, India	dr..simran.gill@example.com	+91 9812350 54356	6	ENT Specialists Hospital		
+Ophthalmology	Dr. Karan Verma	48 Pakhowal Rd, Ludhiana, India	dr..karan.verma@example.com	+91 9812351 54363	7	VisionEye Hospital		
+Psychiatry	Dr. Manisha Bedi	51 Sunder Nagar, Ludhiana, India	dr..manisha.bedi@example.com	+91 9812352 54370	8	MindWell Psychiatric Center		
+Gastroenterology	Dr. Vikram Chawla	54 Shastri Nagar, Ludhiana, India	dr..vikram.chawla@example.com	+91 9812353 54377	9	Digestive Care Hospital		
+Pulmonology	Dr. Anjali Rao	57 Ghumar Mandi, Ludhiana, India	dr..anjali.rao@example.com	+91 9812354 54384	10	LungWell Medical Center		
+Cardiology	Dr. Suresh Iyer	60 Rosewood Ave, Ludhiana, India	dr..suresh.iyer@example.com	+91 9812355 54391	11	City Heart Center		
+Neurology	Dr. Pooja Nair	63 Green Park Rd, Ludhiana, India	dr..pooja.nair@example.com	+91 9812356 54398	12	NeuroCare Hospital		
+Pediatrics	Dr. Rahul Khanna	66 Model Town, Ludhiana, India	dr..rahul.khanna@example.com	+91 9812357 54405	13	Sunshine Children's Clinic		
+Orthopedics	Dr. Meera Joshi	69 Civil Lines, Ludhiana, India	dr..meera.joshi@example.com	+91 9812358 54412	14	OrthoPlus Hospital		
+Dermatology	Dr. Anand Kulkarni	72 Gandhi Bazar, Ludhiana, India	dr..anand.kulkarni@example.com	+91 9812359 54419	15	DermaCare Clinic		
+ENT	Dr. Sunita Reddy	75 Industrial Area, Ludhiana, India	dr..sunita.reddy@example.com	+91 9812360 54426	16	ENT Specialists Hospital		
+Ophthalmology	Dr. Arjun Patil	78 Pakhowal Rd, Ludhiana, India	dr..arjun.patil@example.com	+91 9812361 54433	17	VisionEye Hospital		
+Psychiatry	Dr. Kavita Deshmukh	81 Sunder Nagar, Ludhiana, India	dr..kavita.deshmukh@example.com	+91 9812362 54440	18	MindWell Psychiatric Center		
+Gastroenterology	Dr. Sanjay Kapoor	84 Shastri Nagar, Ludhiana, India	dr..sanjay.kapoor@example.com	+91 9812363 54447	19	Digestive Care Hospital		
+Pulmonology	Dr. Nisha Shah	87 Ghumar Mandi, Ludhiana, India	dr..nisha.shah@example.com	+91 9812364 54454	20	LungWell Medical Center		
+Cardiology	Dr. Aarav Mehta	90 Rosewood Ave, Ludhiana, India	dr..aarav.mehta@example.com	+91 9812365 54461	21	City Heart Center		
+Neurology	Dr. Priya Singh	93 Green Park Rd, Ludhiana, India	dr..priya.singh@example.com	+91 9812366 54468	22	NeuroCare Hospital		
+Pediatrics	Dr. Rohan Sharma	96 Model Town, Ludhiana, India	dr..rohan.sharma@example.com	+91 9812367 54475	23	Sunshine Children's Clinic		
+Orthopedics	Dr. Neha Kaur	99 Civil Lines, Ludhiana, India	dr..neha.kaur@example.com	+91 9812368 54482	24	OrthoPlus Hospital		
+Dermatology	Dr. Amit Dhillon	102 Gandhi Bazar, Ludhiana, India	dr..amit.dhillon@example.com	+91 9812369 54489	25	DermaCare Clinic		
+ENT	Dr. Simran Gill	105 Industrial Area, Ludhiana, India	dr..simran.gill@example.com	+91 9812370 54496	1	ENT Specialists Hospital		
+Ophthalmology	Dr. Karan Verma	108 Pakhowal Rd, Ludhiana, India	dr..karan.verma@example.com	+91 9812371 54503	2	VisionEye Hospital		
+Psychiatry	Dr. Manisha Bedi	111 Sunder Nagar, Ludhiana, India	dr..manisha.bedi@example.com	+91 9812372 54510	3	MindWell Psychiatric Center		
+Gastroenterology	Dr. Vikram Chawla	114 Shastri Nagar, Ludhiana, India	dr..vikram.chawla@example.com	+91 9812373 54517	4	Digestive Care Hospital		
+Pulmonology	Dr. Anjali Rao	117 Ghumar Mandi, Ludhiana, India	dr..anjali.rao@example.com	+91 9812374 54524	5	LungWell Medical Center		
+Cardiology	Dr. Suresh Iyer	120 Rosewood Ave, Ludhiana, India	dr..suresh.iyer@example.com	+91 9812375 54531	6	City Heart Center		
+Neurology	Dr. Pooja Nair	123 Green Park Rd, Ludhiana, India	dr..pooja.nair@example.com	+91 9812376 54538	7	NeuroCare Hospital		
+Pediatrics	Dr. Rahul Khanna	126 Model Town, Ludhiana, India	dr..rahul.khanna@example.com	+91 9812377 54545	8	Sunshine Children's Clinic		
+Orthopedics	Dr. Meera Joshi	129 Civil Lines, Ludhiana, India	dr..meera.joshi@example.com	+91 9812378 54552	9	OrthoPlus Hospital		
+Dermatology	Dr. Anand Kulkarni	132 Gandhi Bazar, Ludhiana, India	dr..anand.kulkarni@example.com	+91 9812379 54559	10	DermaCare Clinic		
+ENT	Dr. Sunita Reddy	135 Industrial Area, Ludhiana, India	dr..sunita.reddy@example.com	+91 9812380 54566	11	ENT Specialists Hospital		
+Ophthalmology	Dr. Arjun Patil	138 Pakhowal Rd, Ludhiana, India	dr..arjun.patil@example.com	+91 9812381 54573	12	VisionEye Hospital		
+Psychiatry	Dr. Kavita Deshmukh	141 Sunder Nagar, Ludhiana, India	dr..kavita.deshmukh@example.com	+91 9812382 54580	13	MindWell Psychiatric Center		
+Gastroenterology	Dr. Sanjay Kapoor	144 Shastri Nagar, Ludhiana, India	dr..sanjay.kapoor@example.com	+91 9812383 54587	14	Digestive Care Hospital		
+Pulmonology	Dr. Nisha Shah	147 Ghumar Mandi, Ludhiana, India	dr..nisha.shah@example.com	+91 9812384 54594	15	LungWell Medical Center		
+Hematology	Dr. Rajesh Kumar	150 Blood Bank Rd, Ludhiana, India	dr.rajesh.kumar@example.com	+91 9812385 54601	18	Blood Disorders & Hematology Center		
+Internal Medicine	Dr. Anita Patel	153 General Hospital Rd, Ludhiana, India	dr.anita.patel@example.com	+91 9812386 54608	12	Ludhiana General Hospital		
+Hematology	Dr. Deepak Verma	156 Medical College Rd, Ludhiana, India	dr.deepak.verma@example.com	+91 9812387 54615	14	Medical College Hospital		
+Internal Medicine	Dr. Sunil Mehta	159 Civil Hospital Rd, Ludhiana, India	dr.sunil.mehta@example.com	+91 9812388 54622	16	Civil Hospital		
+General Surgery	Dr. Sumit Malhotra	162 Main Hospital Rd, Ludhiana, India	dr.sumit.malhotra@example.com	+91 9812389 54629	10	City Hospital		
+Obstetrics & Gynecology	Dr. Pooja Gupta	165 Women's Care Rd, Ludhiana, India	dr.pooja.gupta@example.com	+91 9812390 54636	13	Women & Child Hospital		
+Anesthesiology	Dr. Vikram Singh	168 Medical Tower, Ludhiana, India	dr.vikram.singh@example.com	+91 9812391 54643	15	City Hospital		
+Emergency Medicine	Dr. Rahul Kumar	171 Trauma Center Rd, Ludhiana, India	dr.rahul.kumar@example.com	+91 9812392 54650	8	Emergency Care Center		
+Internal Medicine	Dr. Rakesh Sharma	12 Civil Lines, Ludhiana, India	rakesh.sharma@example.com	+91 98111 22334	15	Ludhiana Medical Centre
+Hematology	Dr. Anjali Kapoor	45 Mall Road, Ludhiana, India	anjali.kapoor@example.com	+91 98765 44321	12	City Hematology Clinic
+Infectious Diseases	Dr. Amit Khanna	78 Model Town, Ludhiana, India	amit.khanna@example.com	+91 98122 33445	10	Global Care Hospital
+Pathology	Dr. Meena Arora	23 Sarabha Nagar, Ludhiana, India	meena.arora@example.com	+91 98199 88776	14	Punjab Diagnostic Labs
