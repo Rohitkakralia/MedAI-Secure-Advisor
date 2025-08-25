@@ -1,26 +1,25 @@
-# Secure Vault
+# MedAI-Secure-Advisor
 
-A modern, secure file storage and sharing platform built with Next.js. Secure Vault provides a robust solution for storing, managing, and sharing files with advanced security features and a beautiful user interface.
+A cutting-edge, privacy-focused medical advisory platform built with Next.js. MedAI-Secure-Advisor empowers users to securely consult, store, and manage sensitive medical information with advanced AI-driven features and a sleek user interface.
 
 ## 🌟 Features
 
-- **Secure Authentication**: Built-in user authentication and authorization system
-- **File Management**: Upload, store, and manage your files securely
-- **User Profiles**: Customizable user profiles with unique usernames
-- **Dashboard**: Intuitive dashboard for managing your files and account
-- **Modern UI**: Beautiful and responsive design with 3D effects and animations
-- **Privacy Controls**: Granular control over file sharing and access
-- **Responsive Design**: Works seamlessly across all devices
+- **AI Medical Advisor**: Get instant, secure medical advice powered by AI
+- **Confidential Consultations**: End-to-end encrypted Documents sharing with medical experts
+- **Health Record Management**: Upload, store, and organize medical documents safely
+- **Modern UI**: Responsive design with interactive visualizations
+- **Granular Privacy Controls**: Manage who can access your health data
+- **Multi-device Support**: Seamless experience across desktop and mobile
 
 ## 🛠️ Tech Stack
 
-- **Frontend**: Next.js 15, React 19
+- **Frontend**: Next.js, React
 - **Styling**: Tailwind CSS
-- **Database**: MongoDB with Mongoose
+- **Database**: MongoDB 
 - **Authentication**: NextAuth.js
-- **File Storage**: EdgeStore
-- **Form Handling**: Zod for validation
-- **UI Effects**: Three.js, Vanta, TSParticles
+- **File Storage**: IPFS
+- **AI Integration**: OpenAI API
+- **UI Effects**: TSParticles
 - **Icons**: Lucide React, React Icons
 
 ## 🚀 Getting Started
@@ -30,13 +29,14 @@ A modern, secure file storage and sharing platform built with Next.js. Secure Va
 - Node.js (Latest LTS version recommended)
 - MongoDB database
 - EdgeStore account for file storage
+- OpenAI API key for AI features
 
 ### Installation
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/Rohitkakralia/SecureVault.git
-   cd secure-vault
+   git clone https://github.com/Rohitkakralia/MedAI-Secure-Advisor.git
+   cd MedAI-Secure-Advisor
    ```
 
 2. Install dependencies:
@@ -51,6 +51,7 @@ A modern, secure file storage and sharing platform built with Next.js. Secure Va
    NEXTAUTH_URL=http://localhost:3000
    EDGESTORE_ACCESS_KEY=your_edgestore_access_key
    EDGESTORE_SECRET_KEY=your_edgestore_secret_key
+   OPENAI_API_KEY=your_openai_api_key
    ```
 
 4. Run the development server:
@@ -63,42 +64,42 @@ A modern, secure file storage and sharing platform built with Next.js. Secure Va
 ## 📁 Project Structure
 
 ```
-secure-vault/
+MedAI-Secure-Advisor/
 ├── app/                    # Next.js app directory
 │   ├── api/               # API routes
 │   ├── components/        # Reusable components
 │   ├── dashboard/         # Dashboard pages
-│   ├── profile/          # User profile pages
-│   └── ...               # Other app routes
+│   ├── advisor/           # AI medical advisor pages
+│   ├── records/           # Health record management
+│   └── ...                # Other app routes
 ├── models/                # Database models
-├── public/               # Static assets
-└── ...                   # Configuration files
+├── public/                # Static assets
+└── ...                    # Configuration files
 ```
 
 ## 🔒 Security Features
 
-- Secure file encryption
+- End-to-end encrypted consultations
+- Secure file encryption for health records
 - Protected API routes
 - User authentication and authorization
-- Secure file sharing mechanisms
-- Privacy controls for shared content
+- Privacy controls for shared medical data
 
 ## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
 
-
 ## 🙏 Acknowledgments
 
 - Next.js team for the amazing framework
+- OpenAI for AI integration
 - All contributors who have helped shape this project
 - The open-source community for their invaluable tools and libraries
 
+🧑‍💻 Author  
+Rohit Kakralia
 
-🧑‍💻 Author
-Rohit kakralia
+LinkedIn: https://www.linkedin.com/in/rohit-kakralia-a35046251/
 
-LinkedIn:https://www.linkedin.com/in/rohit-kakralia-a35046251/
-
-GitHub:https://github.com/Rohitkakralia
-# MedAI-Secure-Advisor
+GitHub: https://github.com/Rohitkakralia
+# MedAI-
