@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from "react";
 import { fetchUser, fetchRole } from "../actions/fetchDetails";
 import { fetchUploads } from "../actions/fetchDetails";
-import { Sparkles, Plus, Stethoscope, Heart } from "lucide-react";
+import { Sparkles, Plus, Stethoscope, Heart, BarChart3 } from "lucide-react";
 import Chatbot from "./chatbot";
+import DoctorAnalyzer from "./DoctorAnalyzer";
 
 export default function FileUpload({ useremail }) {
   const [file, setFile] = useState(null);
@@ -23,6 +24,7 @@ export default function FileUpload({ useremail }) {
   const [role, setRole] = useState(""); // For drag and drop state
 
   const [openAI, setOpenAI] = useState(false);
+  const [openAnalyzer, setOpenAnalyzer] = useState(false);
 
   const [isHovered, setIsHovered] = useState(false);
   const fileInputRef = useRef(null); // Reference to the file input element
@@ -1585,11 +1587,154 @@ export default function FileUpload({ useremail }) {
             </div>
           </div>
         ) : (
-          <div className="animate-in slide-in-from-bottom-5 fade-in-0 duration-300">
-            <Chatbot useremail={userEmail} onClose={() => setOpenAI(false)} />
+          <div className="fixed inset-0 flex items-center justify-center bg-black/20 backdrop-blur-sm z-50 p-8 overflow-hidden">
+            <div className="animate-in slide-in-from-bottom-5 fade-in-0 duration-300 w-full h-full flex items-center justify-center">
+              <Chatbot useremail={userEmail} onClose={() => setOpenAI(false)} />
+            </div>
           </div>
         )}
       </div>
+      )}
+
+      {/* Doctor Analyzer button */}
+      {role === "doctor" && (
+        <div className="fixed bottom-4 right-4 z-[9999] flex items-end flex-col gap-2">
+          {/* Animated text */}
+          {!openAnalyzer && (
+            <div
+              className={`bg-white/90 backdrop-blur-sm px-3 py-2 rounded-lg shadow-md transition-all duration-300 transform ${
+                isHovered
+                  ? "opacity-100 translate-x-0"
+                  : "opacity-0 translate-x-2"
+              }`}
+              onMouseEnter={() => setIsHovered(true)}
+              onMouseLeave={() => setIsHovered(false)}
+            >
+              <div className="text-sm font-medium text-gray-800 flex items-center">
+                <span className="mr-1">Access advanced</span>
+                <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-500">
+                  Doctor Analyzer
+                </span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="ml-1 animate-bounce"
+                >
+                  <path d="M5 12h14"></path>
+                  <path d="M12 5l7 7-7 7"></path>
+                </svg>
+              </div>
+            </div>
+          )}
+
+          {!openAnalyzer ? (
+            <div className="relative">
+              {/* Pulse animation rings */}
+              <div className="absolute inset-0 animate-ping">
+                <div className="w-16 h-16 rounded-full bg-indigo-400 opacity-20"></div>
+              </div>
+              <div className="absolute inset-0 animate-pulse delay-75">
+                <div className="w-16 h-16 rounded-full bg-purple-400 opacity-15"></div>
+              </div>
+
+              {/* Main button */}
+              <button
+                className={`
+          relative w-16 h-16 rounded-full shadow-2xl transition-all duration-300 transform
+          bg-gradient-to-br from-indigo-500 via-indigo-600 to-purple-500
+          hover:from-indigo-600 hover:via-indigo-700 hover:to-purple-600
+          ${isHovered ? "scale-110" : "scale-100"}
+          group overflow-hidden
+        `}
+                onClick={() => setOpenAnalyzer(true)}
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+              >
+                {/* Background gradient overlay */}
+                <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-50"></div>
+
+                {/* Sparkle effects */}
+                <div className="absolute top-2 right-2">
+                  <BarChart3
+                    size={8}
+                    className="text-white/60 animate-pulse"
+                    style={{ animationDelay: "0.5s" }}
+                  />
+                </div>
+                <div className="absolute bottom-3 left-2">
+                  <BarChart3
+                    size={6}
+                    className="text-white/40 animate-pulse"
+                    style={{ animationDelay: "1s" }}
+                  />
+                </div>
+
+                {/* Medical cross background */}
+                <div className="absolute inset-0 flex items-center justify-center opacity-10">
+                  <Plus size={32} className="text-white" />
+                </div>
+
+                {/* Main icons */}
+                <div className="relative z-10 w-full h-full flex items-center justify-center">
+                  <div className="relative">
+                    {/* BarChart icon */}
+                    <BarChart3
+                      size={18}
+                      className={`text-white transition-all duration-300 ${
+                        isHovered ? "transform -translate-y-1" : ""
+                      }`}
+                    />
+
+                    {/* Stethoscope icon that appears on hover */}
+                    <Stethoscope
+                      size={10}
+                      className={`absolute -bottom-1 -right-1 text-blue-300 transition-all duration-300 ${
+                        isHovered ? "opacity-100 scale-100" : "opacity-0 scale-50"
+                      }`}
+                    />
+                  </div>
+                </div>
+
+                {/* Tooltip */}
+                <div
+                  className={`
+            absolute bottom-full right-0 mb-2 px-3 py-1 bg-gray-900 text-white text-xs 
+            rounded-lg whitespace-nowrap transition-all duration-200 pointer-events-none
+            ${
+              isHovered
+                ? "opacity-100 translate-y-0"
+                : "opacity-0 translate-y-1"
+            }
+          `}
+                >
+                  Analyze patient data
+                  <div className="absolute top-full right-3 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
+                </div>
+              </button>
+
+              {/* Floating medical icons */}
+              <div className="absolute -top-2 -left-2 w-4 h-4 bg-blue-100 rounded-full flex items-center justify-center animate-bounce">
+                <BarChart3 size={8} className="text-blue-500" />
+              </div>
+
+              {/* Status indicator */}
+              <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
+                <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+              </div>
+            </div>
+          ) : (
+            <div className="animate-in slide-in-from-bottom-5 fade-in-0 duration-300">
+              <DoctorAnalyzer useremail={userEmail} onClose={() => setOpenAnalyzer(false)} />
+            </div>
+          )}
+        </div>
       )}
     </div>
 

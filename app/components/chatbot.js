@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { GoogleGenAI } from "@google/genai";
 import { fetchUser, fetchUploads } from "../actions/fetchDetails";
 import { fetchHash, fetchIv, decryptImage } from "../actions/decrypt";
 import CalendlyPopup from "./CalendlyPopup";
 import Papa from "papaparse";
 import { useRouter } from 'next/navigation';
-import { MessageCircle, FileText, Send, Loader2, User, Bot, Upload, Check, AlertCircle, Stethoscope, Phone, Mail, MapPin, Star, Calendar, Award, ExternalLink } from "lucide-react";
+import { MessageCircle, FileText, Send, Loader2, User, Bot, Upload, Check, AlertCircle, Stethoscope, Phone, Mail, MapPin, Star, Calendar, Award, ExternalLink, Maximize2, Minimize2 } from "lucide-react";
 
 const Chatbot = ({ useremail, onClose}) => {
   const router = useRouter();
@@ -15,6 +15,15 @@ const Chatbot = ({ useremail, onClose}) => {
   const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [csvData, setCsvData] = useState([]);
+  
+  // Resize functionality
+  const [dimensions, setDimensions] = useState({ width: 1200, height: 800 });
+  const [isResizing, setIsResizing] = useState(false);
+  const [resizeType, setResizeType] = useState('');
+  const [isMaximized, setIsMaximized] = useState(false);
+  const containerRef = useRef(null);
+  const startPosRef = useRef({ x: 0, y: 0 });
+  const startDimensionsRef = useRef({ width: 0, height: 0 });
 
   // Local storage key for chat messages
   const CHAT_STORAGE_KEY = `chat_messages_${useremail || 'anonymous'}`;
@@ -28,10 +37,109 @@ const Chatbot = ({ useremail, onClose}) => {
   }
   const calendlyLink = "CALENDLY_LINK"; // Replace with your event link
 
+  // Resize handlers
+  const handleMouseDown = (e, type) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsResizing(true);
+    setResizeType(type);
+    startPosRef.current = { x: e.clientX, y: e.clientY };
+    startDimensionsRef.current = { ...dimensions };
+  };
+
+  const handleMouseMove = (e) => {
+    if (!isResizing) return;
+    
+    const deltaX = e.clientX - startPosRef.current.x;
+    const deltaY = e.clientY - startPosRef.current.y;
+    
+    let newWidth = startDimensionsRef.current.width;
+    let newHeight = startDimensionsRef.current.height;
+    
+    // Get viewport dimensions with padding
+    const maxWidth = window.innerWidth - 80; // 40px padding on each side
+    const maxHeight = window.innerHeight - 80; // 40px padding on top and bottom
+    
+    if (resizeType.includes('right')) {
+      newWidth = Math.max(400, Math.min(maxWidth, startDimensionsRef.current.width + deltaX));
+    }
+    if (resizeType.includes('left')) {
+      newWidth = Math.max(400, Math.min(maxWidth, startDimensionsRef.current.width - deltaX));
+    }
+    if (resizeType.includes('bottom')) {
+      newHeight = Math.max(300, Math.min(maxHeight, startDimensionsRef.current.height + deltaY));
+    }
+    if (resizeType.includes('top')) {
+      newHeight = Math.max(300, Math.min(maxHeight, startDimensionsRef.current.height - deltaY));
+    }
+    
+    setDimensions({ width: newWidth, height: newHeight });
+  };
+
+  const handleMouseUp = () => {
+    setIsResizing(false);
+    setResizeType('');
+  };
+
+  const toggleMaximize = () => {
+    if (isMaximized) {
+      setDimensions({ width: 1200, height: 800 });
+    } else {
+      // Account for padding and ensure content is fully visible
+      const maxWidth = window.innerWidth - 80; // 40px padding on each side
+      const maxHeight = window.innerHeight - 80; // 40px padding on top and bottom
+      setDimensions({ width: maxWidth, height: maxHeight });
+    }
+    setIsMaximized(!isMaximized);
+  };
+
+  // Add event listeners for resize
+  useEffect(() => {
+    if (isResizing) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      document.body.style.cursor = getResizeCursor();
+    } else {
+      document.body.style.cursor = 'default';
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+      document.body.style.cursor = 'default';
+    };
+  }, [isResizing, resizeType]);
+
+  // Handle window resize to keep chatbot within viewport
+  useEffect(() => {
+    const handleWindowResize = () => {
+      const maxWidth = window.innerWidth - 80;
+      const maxHeight = window.innerHeight - 80;
+      
+      setDimensions(prev => ({
+        width: Math.min(prev.width, maxWidth),
+        height: Math.min(prev.height, maxHeight)
+      }));
+    };
+
+    window.addEventListener('resize', handleWindowResize);
+    return () => window.removeEventListener('resize', handleWindowResize);
+  }, []);
+
+  const getResizeCursor = () => {
+    if (resizeType.includes('right') && resizeType.includes('bottom')) return 'nw-resize';
+    if (resizeType.includes('left') && resizeType.includes('bottom')) return 'ne-resize';
+    if (resizeType.includes('right') && resizeType.includes('top')) return 'sw-resize';
+    if (resizeType.includes('left') && resizeType.includes('top')) return 'se-resize';
+    if (resizeType.includes('right') || resizeType.includes('left')) return 'ew-resize';
+    if (resizeType.includes('top') || resizeType.includes('bottom')) return 'ns-resize';
+    return 'default';
+  };
+
 
 
   // Move API key to environment variable
-  const ai = new GoogleGenAI({ apiKey: "API_KEY"});
+  const ai = new GoogleGenAI({ apiKey: process.env.NEXT_PUBLIC_GOOGLE_API_KEY });
 
   useEffect(() => {
     fetch("/doctors.csv")
@@ -608,9 +716,69 @@ const copyEmail = async (email) => {
 
 
   return (
-    <div className="flex h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+    <div 
+      ref={containerRef}
+      className="flex bg-gradient-to-br from-blue-50 via-white to-indigo-50 relative shadow-2xl border border-gray-300 rounded-lg overflow-hidden select-none"
+      style={{ 
+        width: `${dimensions.width}px`, 
+        height: `${dimensions.height}px`,
+        minWidth: '400px',
+        minHeight: '300px',
+        resize: 'none'
+      }}
+    >
+      {/* Resize Handles */}
+      {/* Top resize handle */}
+      <div
+        className="absolute top-0 left-0 right-0 h-2 cursor-ns-resize hover:bg-blue-400/30 z-50 transition-colors duration-200"
+        onMouseDown={(e) => handleMouseDown(e, 'top')}
+      />
+      
+      {/* Bottom resize handle */}
+      <div
+        className="absolute bottom-0 left-0 right-0 h-2 cursor-ns-resize hover:bg-blue-400/30 z-50 transition-colors duration-200"
+        onMouseDown={(e) => handleMouseDown(e, 'bottom')}
+      />
+      
+      {/* Left resize handle */}
+      <div
+        className="absolute top-0 bottom-0 left-0 w-2 cursor-ew-resize hover:bg-blue-400/30 z-50 transition-colors duration-200"
+        onMouseDown={(e) => handleMouseDown(e, 'left')}
+      />
+      
+      {/* Right resize handle */}
+      <div
+        className="absolute top-0 bottom-0 right-0 w-2 cursor-ew-resize hover:bg-blue-400/30 z-50 transition-colors duration-200"
+        onMouseDown={(e) => handleMouseDown(e, 'right')}
+      />
+      
+      {/* Corner resize handles */}
+      <div
+        className="absolute top-0 left-0 w-4 h-4 cursor-nw-resize hover:bg-blue-400/50 z-50 transition-colors duration-200 rounded-br-lg"
+        onMouseDown={(e) => handleMouseDown(e, 'top-left')}
+      />
+      <div
+        className="absolute top-0 right-0 w-4 h-4 cursor-ne-resize hover:bg-blue-400/50 z-50 transition-colors duration-200 rounded-bl-lg"
+        onMouseDown={(e) => handleMouseDown(e, 'top-right')}
+      />
+      <div
+        className="absolute bottom-0 left-0 w-4 h-4 cursor-sw-resize hover:bg-blue-400/50 z-50 transition-colors duration-200 rounded-tr-lg"
+        onMouseDown={(e) => handleMouseDown(e, 'bottom-left')}
+      />
+      <div
+        className="absolute bottom-0 right-0 w-4 h-4 cursor-se-resize hover:bg-blue-400/50 z-50 transition-colors duration-200 rounded-tl-lg"
+        onMouseDown={(e) => handleMouseDown(e, 'bottom-right')}
+      />
+
+      {/* Resize indicator */}
+      {isResizing && (
+        <div className="absolute top-2 right-2 bg-blue-600 text-white px-2 py-1 rounded text-xs font-medium z-50">
+          {Math.round(dimensions.width)} × {Math.round(dimensions.height)}
+        </div>
+      )}
+
       {/* Sidebar */}
-      <div className="w-80 bg-white/80 backdrop-blur-lg border-r border-gray-200/50 shadow-xl">
+      <div className="w-80 bg-white/80 backdrop-blur-lg border-r border-gray-200/50 shadow-xl flex-shrink-0">
         <div className="p-6">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center space-x-3">
@@ -714,19 +882,28 @@ const copyEmail = async (email) => {
                 </p>
               </div>
             </div>
-            <button
-              onClick={onClose}
-              className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all duration-200"
-              title="Close Chatbot"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={toggleMaximize}
+                className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-all duration-200"
+                title={isMaximized ? "Restore" : "Maximize"}
+              >
+                {isMaximized ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+              </button>
+              <button
+                onClick={onClose}
+                className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all duration-200"
+                title="Close Chatbot"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+        <div className="flex-1 overflow-y-auto p-6 space-y-6" style={{ maxHeight: `${dimensions.height - 180}px` }}>
           {messages.length === 0 ? (
             <div className="h-full flex items-center justify-center">
               <div className="text-center max-w-md">
@@ -867,7 +1044,7 @@ const copyEmail = async (email) => {
           )}
         </div>
 
-        <div className="bg-white/80 backdrop-blur-lg border-t border-gray-200/50 px-6 py-4 shadow-lg">
+        <div className="bg-white/80 backdrop-blur-lg border-t border-gray-200/50 px-6 py-4 shadow-lg flex-shrink-0">
           {selectedFile && (
             <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-xl">
               <div className="flex items-center space-x-2">

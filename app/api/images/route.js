@@ -3,7 +3,7 @@ import connectDB from "@/db/connectDb";
 import Image from "@/models/Image";
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "../auth/[...nextauth]/route";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 export async function GET(request) {
   await connectDB();
