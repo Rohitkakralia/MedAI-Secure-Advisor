@@ -35,9 +35,7 @@ const PatientSchema = new mongoose.Schema({
     required: false
   },
   address: {
-    street: String,
-    city: String,
-    state: String,
+    addressLine: String,
     zipCode: String,
     country: {
       type: String,
@@ -257,7 +255,63 @@ const PatientSchema = new mongoose.Schema({
     doctor: String,
     doctorEmail: String,
     notes: String,
-    followUpDate: Date
+    diagnosis: String,
+    medications: [{
+      name: String,
+      dosage: String,
+      frequency: String,
+      duration: String,
+      instructions: String
+    }],
+    vitalSigns: {
+      bloodPressure: {
+        systolic: Number,
+        diastolic: Number
+      },
+      heartRate: {
+        value: Number,
+        unit: { type: String, default: 'bpm' }
+      },
+      temperature: {
+        value: Number,
+        unit: { type: String, default: '°F' }
+      },
+      weight: {
+        value: Number,
+        unit: { type: String, default: 'lbs' }
+      },
+      oxygenSaturation: {
+        value: Number,
+        unit: { type: String, default: '%' }
+      }
+    },
+    labResults: {
+      cholesterol: {
+        total: Number,
+        ldl: Number,
+        hdl: Number,
+        unit: { type: String, default: 'mg/dL' }
+      },
+      glucose: {
+        fasting: Number,
+        random: Number,
+        unit: { type: String, default: 'mg/dL' }
+      },
+      hba1c: {
+        value: Number,
+        unit: { type: String, default: '%' }
+      },
+      other: [{
+        testName: String,
+        value: String,
+        unit: String,
+        reference: String
+      }]
+    },
+    followUpDate: Date,
+    followUpNotes: String,
+    appointmentId: String, // Unique identifier linking to appointment
+    createdAt: { type: Date, default: Date.now }
   }],
 
   // Appointments
@@ -266,16 +320,74 @@ const PatientSchema = new mongoose.Schema({
     time: String,
     type: {
       type: String,
-      enum: ['Consultation', 'Follow-up', 'Emergency', 'Routine Check-up'],
+      enum: ['Consultation', 'Follow-up', 'Emergency', 'Routine Check-up', 'Procedure', 'Surgery'],
       default: 'Consultation'
     },
     status: {
       type: String,
-      enum: ['Scheduled', 'Completed', 'Cancelled', 'Rescheduled'],
+      enum: ['Scheduled', 'Completed', 'Cancelled', 'Rescheduled', 'No Show'],
       default: 'Scheduled'
     },
     notes: String,
-    doctor: String
+    doctor: String,
+    doctorEmail: String,
+    treatment: String,
+    diagnosis: String,
+    medications: [{
+      name: String,
+      dosage: String,
+      frequency: String,
+      duration: String,
+      instructions: String
+    }],
+    vitalSigns: {
+      bloodPressure: {
+        systolic: Number,
+        diastolic: Number
+      },
+      heartRate: {
+        value: Number,
+        unit: { type: String, default: 'bpm' }
+      },
+      temperature: {
+        value: Number,
+        unit: { type: String, default: '°F' }
+      },
+      weight: {
+        value: Number,
+        unit: { type: String, default: 'lbs' }
+      },
+      oxygenSaturation: {
+        value: Number,
+        unit: { type: String, default: '%' }
+      }
+    },
+    labResults: {
+      cholesterol: {
+        total: Number,
+        ldl: Number,
+        hdl: Number,
+        unit: { type: String, default: 'mg/dL' }
+      },
+      glucose: {
+        fasting: Number,
+        random: Number,
+        unit: { type: String, default: 'mg/dL' }
+      },
+      hba1c: {
+        value: Number,
+        unit: { type: String, default: '%' }
+      },
+      other: [{
+        testName: String,
+        value: String,
+        unit: String,
+        reference: String
+      }]
+    },
+    followUpDate: Date,
+    followUpNotes: String,
+    createdAt: { type: Date, default: Date.now }
   }],
 
   // Insurance Information

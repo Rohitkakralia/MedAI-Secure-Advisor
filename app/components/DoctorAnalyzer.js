@@ -35,6 +35,8 @@ import {
   Plus,
 } from "lucide-react";
 import PatientManager from "./PatientManager";
+import AppointmentModal from "./AppointmentModal";
+import TreatmentReportModal from "./TreatmentReportModal";
 
 const DoctorAnalyzer = ({ useremail, onClose }) => {
   const [patients, setPatients] = useState([]);
@@ -56,6 +58,9 @@ const DoctorAnalyzer = ({ useremail, onClose }) => {
   const [resizeType, setResizeType] = useState("");
   const [isMaximized, setIsMaximized] = useState(false);
   const [showPatientManager, setShowPatientManager] = useState(false);
+  const [showAppointmentModal, setShowAppointmentModal] = useState(false);
+  const [showTreatmentReport, setShowTreatmentReport] = useState(false);
+  const [selectedTreatment, setSelectedTreatment] = useState(null);
   const containerRef = useRef(null);
   const startPosRef = useRef({ x: 0, y: 0 });
   const startDimensionsRef = useRef({ width: 0, height: 0 });
@@ -443,6 +448,20 @@ const DoctorAnalyzer = ({ useremail, onClose }) => {
     fetchAnalytics(); // Refresh analytics
   };
 
+  const handleAppointmentAdded = (result) => {
+    // Refresh the patient data to show updated treatment history
+    fetchPatients();
+    fetchAnalytics();
+    
+    // Show success message
+    alert('Appointment and treatment added successfully!');
+  };
+
+  const handleTreatmentClick = (treatment) => {
+    setSelectedTreatment(treatment);
+    setShowTreatmentReport(true);
+  };
+
   const handleRefresh = () => {
     fetchPatients();
     fetchAnalytics();
@@ -656,20 +675,17 @@ const DoctorAnalyzer = ({ useremail, onClose }) => {
                         <h3 className="font-medium text-gray-900 text-sm">
                           {patient.name}
                         </h3>
-                        <p className="text-xs text-gray-600">
-                          {patient.condition}
-                        </p>
                         <p className="text-xs text-gray-500">
                           Age: {patient.age} • {patient.gender}
                         </p>
                       </div>
-                      <div
+                      {/* <div
                         className={`px-2 py-1 rounded-full text-xs font-medium ${getRiskColor(
                           patient.riskLevel
                         )}`}
                       >
                         {patient.riskLevel}
-                      </div>
+                      </div> */}
                     </div>
                     <div className="mt-2 flex items-center text-xs text-gray-500">
                       <Calendar className="h-3 w-3 mr-1" />
@@ -694,12 +710,21 @@ const DoctorAnalyzer = ({ useremail, onClose }) => {
                       <UserCheck className="h-5 w-5 mr-2 text-blue-600" />
                       Patient Overview: {selectedPatient.name}
                     </h3>
-                    <div
-                      className={`px-3 py-1 rounded-full text-sm font-medium ${getRiskColor(
-                        selectedPatient.riskLevel
-                      )}`}
-                    >
-                      {selectedPatient.riskLevel} Risk
+                    <div className="flex items-center space-x-3">
+                      <button
+                        onClick={() => setShowAppointmentModal(true)}
+                        className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200 text-sm font-medium"
+                      >
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add Appointment
+                      </button>
+                      <div
+                        className={`px-3 py-1 rounded-full text-sm font-medium ${getRiskColor(
+                          selectedPatient.riskLevel
+                        )}`}
+                      >
+                        {selectedPatient.riskLevel} Risk
+                      </div>
                     </div>
                   </div>
 
@@ -708,14 +733,10 @@ const DoctorAnalyzer = ({ useremail, onClose }) => {
                       <div className="flex items-center justify-between">
                         <div>
                           <p className="text-sm text-blue-600 font-medium">
-                            Blood Pressure
+                            Age
                           </p>
                           <p className="text-2xl font-bold text-blue-900">
-                            {selectedPatient.vitalSigns?.bloodPressure
-                              ?.systolic &&
-                            selectedPatient.vitalSigns?.bloodPressure?.diastolic
-                              ? `${selectedPatient.vitalSigns.bloodPressure.systolic}/${selectedPatient.vitalSigns.bloodPressure.diastolic}`
-                              : "N/A"}
+                            {selectedPatient.age}
                           </p>
                         </div>
                         <Heart className="h-8 w-8 text-blue-500" />
@@ -725,12 +746,10 @@ const DoctorAnalyzer = ({ useremail, onClose }) => {
                       <div className="flex items-center justify-between">
                         <div>
                           <p className="text-sm text-green-600 font-medium">
-                            Heart Rate
+                            Gender
                           </p>
                           <p className="text-2xl font-bold text-green-900">
-                            {selectedPatient.vitalSigns?.heartRate?.value
-                              ? `${selectedPatient.vitalSigns.heartRate.value} bpm`
-                              : "N/A"}
+                            {selectedPatient.gender}
                           </p>
                         </div>
                         <Activity className="h-8 w-8 text-green-500" />
@@ -740,12 +759,10 @@ const DoctorAnalyzer = ({ useremail, onClose }) => {
                       <div className="flex items-center justify-between">
                         <div>
                           <p className="text-sm text-orange-600 font-medium">
-                            Temperature
+                            Height
                           </p>
                           <p className="text-2xl font-bold text-orange-900">
-                            {selectedPatient.vitalSigns?.temperature?.value
-                              ? `${selectedPatient.vitalSigns.temperature.value}°F`
-                              : "N/A"}
+                            {selectedPatient.height}
                           </p>
                         </div>
                         <Activity className="h-8 w-8 text-orange-500" />
@@ -772,43 +789,24 @@ const DoctorAnalyzer = ({ useremail, onClose }) => {
                 {/* Lab Results */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="text-center p-4 bg-gray-50 rounded-lg">
-                    <p className="text-sm text-gray-600">Cholesterol</p>
+                    <p className="text-sm text-gray-600">Mobile</p>
                     <p className="text-2xl font-bold text-gray-900">
-                      {selectedPatient.labResults?.cholesterol?.total
-                        ? `${selectedPatient.labResults.cholesterol.total} mg/dL`
-                        : "N/A"}
-                    </p>
-                    <p className="text-xs text-red-600">
-                      {selectedPatient.labResults?.cholesterol?.total > 200
-                        ? "Above normal"
-                        : "Normal"}
+                      {selectedPatient.phoneNumber}
                     </p>
                   </div>
                   <div className="text-center p-4 bg-gray-50 rounded-lg">
-                    <p className="text-sm text-gray-600">Glucose</p>
+                    <p className="text-sm text-gray-600">Email</p>
                     <p className="text-2xl font-bold text-gray-900">
-                      {selectedPatient.labResults?.glucose?.fasting
-                        ? `${selectedPatient.labResults.glucose.fasting} mg/dL`
-                        : "N/A"}
+                      {selectedPatient.email? selectedPatient.email : "N/A"}
                     </p>
-                    <p className="text-xs text-orange-600">
-                      {selectedPatient.labResults?.glucose?.fasting > 100
-                        ? "Elevated"
-                        : "Normal"}
-                    </p>
+                    
                   </div>
                   <div className="text-center p-4 bg-gray-50 rounded-lg">
-                    <p className="text-sm text-gray-600">HbA1c</p>
+                    <p className="text-sm text-gray-600">Zip Code</p>
                     <p className="text-2xl font-bold text-gray-900">
-                      {selectedPatient.labResults?.hba1c?.value
-                        ? `${selectedPatient.labResults.hba1c.value}%`
-                        : "N/A"}
+                      {selectedPatient.zipCode? selectedPatient.zipCode : "N/A"}
                     </p>
-                    <p className="text-xs text-red-600">
-                      {selectedPatient.labResults?.hba1c?.value > 6.5
-                        ? "Poor control"
-                        : "Good control"}
-                    </p>
+                    
                   </div>
                 </div>
 
@@ -819,24 +817,32 @@ const DoctorAnalyzer = ({ useremail, onClose }) => {
                     Treatment History
                   </h3>
                   <div className="space-y-3">
-                    {selectedPatient.treatmentHistory.map(
-                      (treatment, index) => (
-                        <div
-                          key={index}
-                          className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg"
+                    {selectedPatient.treatmentHistory && selectedPatient.treatmentHistory.length > 0 ? (
+                      selectedPatient.treatmentHistory.map((treatment, index) => (
+                        <div 
+                          key={index} 
+                          onClick={() => handleTreatmentClick(treatment)}
+                          className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-blue-50 hover:border-blue-200 border border-transparent transition-all duration-200"
                         >
                           <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
                           <div className="flex-1">
-                            <p className="text-sm font-medium text-gray-900">
-                              {treatment.treatment}
-                            </p>
-                            <p className="text-xs text-gray-600">
-                              {treatment.doctor} •{" "}
-                              {new Date(treatment.date).toLocaleDateString()}
-                            </p>
+                            <p className="text-sm font-medium text-gray-900">{treatment.treatment}</p>
+                            <p className="text-xs text-gray-600">{treatment.doctor} • {new Date(treatment.date).toLocaleDateString()}</p>
+                            {treatment.diagnosis && (
+                              <p className="text-xs text-blue-600 mt-1">Diagnosis: {treatment.diagnosis}</p>
+                            )}
+                          </div>
+                          <div className="text-xs text-gray-400 hover:text-blue-600 transition-colors duration-200">
+                            Click to view report
                           </div>
                         </div>
-                      )
+                      ))
+                    ) : (
+                      <div className="text-center py-8">
+                        <ClipboardList className="h-12 w-12 text-gray-300 mx-auto mb-3" />
+                        <p className="text-gray-500">No treatment history available</p>
+                        <p className="text-sm text-gray-400 mt-1">Add an appointment to create treatment records</p>
+                      </div>
                     )}
                   </div>
                 </div>
@@ -976,6 +982,25 @@ const DoctorAnalyzer = ({ useremail, onClose }) => {
         isOpen={showPatientManager}
         onClose={() => setShowPatientManager(false)}
         onPatientAdded={handlePatientAdded}
+      />
+
+      {/* Appointment Modal */}
+      <AppointmentModal
+        isOpen={showAppointmentModal}
+        onClose={() => setShowAppointmentModal(false)}
+        patient={selectedPatient}
+        onAppointmentAdded={handleAppointmentAdded}
+      />
+
+      {/* Treatment Report Modal */}
+      <TreatmentReportModal
+        isOpen={showTreatmentReport}
+        onClose={() => {
+          setShowTreatmentReport(false);
+          setSelectedTreatment(null);
+        }}
+        treatment={selectedTreatment}
+        patient={selectedPatient}
       />
     </div>
   );

@@ -314,11 +314,32 @@ const PatientManager = ({ isOpen, onClose, onPatientAdded }) => {
                   placeholder="Enter email address"
                 />
               </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Address Line *</label>
+                <input
+                  type="address.addressLine"
+                  value={formData.address.addressLine}
+                  onChange={(e) => handleInputChange('address.addressLine', e.target.value)}
+                  className="w-full text-black px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Enter Address"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Zip Code *</label>
+                <input
+                  type="address.zipCode"
+                  value={formData.address.zipCode}
+                  onChange={(e) => handleInputChange('address.zipCode', e.target.value)}
+                  className="w-full text-black px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Enter zipCode"
+                />
+              </div>
             </div>
           </div>
 
           {/* Medical Information */}
-          <div className="bg-gray-50 rounded-xl p-6">
+          {/* <div className="bg-gray-50 rounded-xl p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
               <Stethoscope className="h-5 w-5 mr-2 text-green-600" />
               Medical Information
@@ -351,7 +372,7 @@ const PatientManager = ({ isOpen, onClose, onPatientAdded }) => {
                 </select>
               </div>
             </div>
-          </div>
+          </div> */}
 
           {/* Vital Signs */}
           <div className="bg-gray-50 rounded-xl p-6">
@@ -360,7 +381,7 @@ const PatientManager = ({ isOpen, onClose, onPatientAdded }) => {
               Vital Signs
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
+              {/* <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Blood Pressure</label>
                 <div className="flex space-x-2">
                   <input
@@ -379,8 +400,8 @@ const PatientManager = ({ isOpen, onClose, onPatientAdded }) => {
                     placeholder="Diastolic"
                   />
                 </div>
-              </div>
-              <div>
+              </div> */}
+              {/* <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Heart Rate (bpm)</label>
                 <input
                   type="number"
@@ -389,8 +410,8 @@ const PatientManager = ({ isOpen, onClose, onPatientAdded }) => {
                   className="w-full text-black px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="Heart rate"
                 />
-              </div>
-              <div>
+              </div> */}
+              {/* <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Temperature (°F)</label>
                 <input
                   type="number"
@@ -399,7 +420,7 @@ const PatientManager = ({ isOpen, onClose, onPatientAdded }) => {
                   className="w-full text-black px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="Temperature"
                 />
-              </div>
+              </div> */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Weight (lbs)</label>
                 <input
@@ -434,7 +455,7 @@ const PatientManager = ({ isOpen, onClose, onPatientAdded }) => {
           </div>
 
           {/* Lab Results */}
-          <div className="bg-gray-50 rounded-xl p-6">
+          {/* <div className="bg-gray-50 rounded-xl p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
               <Activity className="h-5 w-5 mr-2 text-purple-600" />
               Lab Results
@@ -472,7 +493,7 @@ const PatientManager = ({ isOpen, onClose, onPatientAdded }) => {
                 />
               </div>
             </div>
-          </div>
+          </div> */}
 
           {/* Notes */}
           <div className="bg-gray-50 rounded-xl p-6">

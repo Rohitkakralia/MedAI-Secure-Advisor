@@ -370,6 +370,7 @@ Please analyze the medical report and provide:
 4. Urgency level assessment
 5. Next steps and actionable advice
 
+
 Format your response in a clear, structured manner with proper sections and bullet points.`;
 
       const contents = [
@@ -958,7 +959,7 @@ const copyEmail = async (email) => {
 
               {/* Chat Control Buttons */}
               {messages.length > 0 && (
-                <div className="flex justify-end mb-4 space-x-3">
+                <div className="flex justify-end mb-4 space-x-3 ">
                   <button
                     onClick={exportChatHistory}
                     className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg text-sm font-medium transition-colors flex items-center space-x-2"
