@@ -24,9 +24,7 @@ const PatientManager = ({ isOpen, onClose, onPatientAdded }) => {
     phoneNumber: '',
     email: '',
     address: {
-      street: '',
-      city: '',
-      state: '',
+      addressLine: '',
       zipCode: '',
       country: 'USA'
     },
@@ -156,6 +154,7 @@ const PatientManager = ({ isOpen, onClose, onPatientAdded }) => {
     setIsSubmitting(true);
     
     try {
+      console.log("creating patient", formData);
       const response = await fetch('/api/patients', {
         method: 'POST',
         headers: {
@@ -315,10 +314,24 @@ const PatientManager = ({ isOpen, onClose, onPatientAdded }) => {
                 />
               </div>
 
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Primary Condition *</label>
+              <input
+                type="text"
+                value={formData.primaryCondition}
+                onChange={(e) => handleInputChange('primaryCondition', e.target.value)}
+                className={`w-full text-black px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  errors.primaryCondition ? 'border-red-500' : 'border-gray-300'
+                }`}
+                placeholder="Enter primary medical condition"
+              />
+              {errors.primaryCondition && <p className="text-red-500 text-xs mt-1">{errors.primaryCondition}</p>}
+            </div>
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Address Line *</label>
                 <input
-                  type="address.addressLine"
+                  type="addres"
                   value={formData.address.addressLine}
                   onChange={(e) => handleInputChange('address.addressLine', e.target.value)}
                   className="w-full text-black px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -328,7 +341,7 @@ const PatientManager = ({ isOpen, onClose, onPatientAdded }) => {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Zip Code *</label>
                 <input
-                  type="address.zipCode"
+                  type="text"
                   value={formData.address.zipCode}
                   onChange={(e) => handleInputChange('address.zipCode', e.target.value)}
                   className="w-full text-black px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"

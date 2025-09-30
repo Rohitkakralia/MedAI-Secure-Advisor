@@ -35,6 +35,10 @@ const PatientSchema = new mongoose.Schema({
     required: false
   },
   address: {
+    // Support both consolidated and granular address inputs from forms
+    street: { type: String },
+    city: { type: String },
+    state: { type: String },
     addressLine: String,
     zipCode: String,
     country: {
@@ -90,50 +94,33 @@ const PatientSchema = new mongoose.Schema({
     bloodPressure: {
       systolic: Number,
       diastolic: Number,
-      unit: {
-        type: String,
-        default: 'mmHg'
-      },
+      unit: { type: String, default: 'mmHg' },
       measuredAt: Date
     },
     heartRate: {
+      // Support both number and { value } shapes coming from the form
       value: Number,
-      unit: {
-        type: String,
-        default: 'bpm'
-      },
+      unit: { type: String, default: 'bpm' },
       measuredAt: Date
     },
     temperature: {
       value: Number,
-      unit: {
-        type: String,
-        default: '°F'
-      },
+      unit: { type: String, default: '°F' },
       measuredAt: Date
     },
     weight: {
       value: Number,
-      unit: {
-        type: String,
-        default: 'lbs'
-      },
+      unit: { type: String, default: 'lbs' },
       measuredAt: Date
     },
     height: {
       value: Number,
-      unit: {
-        type: String,
-        default: 'inches'
-      },
+      unit: { type: String, default: 'inches' },
       measuredAt: Date
     },
     oxygenSaturation: {
       value: Number,
-      unit: {
-        type: String,
-        default: '%'
-      },
+      unit: { type: String, default: '%' },
       measuredAt: Date
     }
   },
