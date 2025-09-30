@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
+import RiskPieChart from "./RiskPieChart";
+
 import {
   Stethoscope,
   Users,
@@ -33,6 +35,9 @@ import {
   X,
   UserPlus,
   Plus,
+  Gender,
+  Ruler,
+  Scale
 } from "lucide-react";
 import PatientManager from "./PatientManager";
 import AppointmentModal from "./AppointmentModal";
@@ -52,6 +57,8 @@ const DoctorAnalyzer = ({ useremail, onClose }) => {
     alerts: true,
     recommendations: true,
   });
+
+
 
   const [dimensions, setDimensions] = useState({ width: 1400, height: 900 });
   const [isResizing, setIsResizing] = useState(false);
@@ -501,7 +508,7 @@ const DoctorAnalyzer = ({ useremail, onClose }) => {
       className="flex bg-gradient-to-br from-slate-50 via-white to-blue-50 relative shadow-2xl border border-gray-300 rounded-lg overflow-hidden select-none"
       style={{
         width: `${dimensions.width}px`,
-        height: `${dimensions.height}px`,
+        height: "100vh",
         minWidth: "600px",
         minHeight: "400px",
         resize: "none",
@@ -587,7 +594,7 @@ const DoctorAnalyzer = ({ useremail, onClose }) => {
 
       {/* Main Content */}
       <div
-        className="flex-1 flex pt-16"
+        className="flex-1 flex pt-16 mt-6"
         style={{ height: `${dimensions.height - 64}px` }}
       >
         {/* Left Sidebar - Patient List */}
@@ -628,13 +635,13 @@ const DoctorAnalyzer = ({ useremail, onClose }) => {
                   placeholder="Search patients..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                  className="w-full text-black pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                 />
               </div>
               <select
                 value={filterType}
                 onChange={(e) => setFilterType(e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                className="w-full text-black p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
               >
                 <option value="all">All Patients</option>
                 <option value="critical">Critical Risk</option>
@@ -752,7 +759,7 @@ const DoctorAnalyzer = ({ useremail, onClose }) => {
                             {selectedPatient.gender}
                           </p>
                         </div>
-                        <Activity className="h-8 w-8 text-green-500" />
+                        <Heart className="h-8 w-8 text-green-500" />
                       </div>
                     </div>
                     <div className="bg-orange-50 p-4 rounded-lg">
@@ -901,7 +908,7 @@ const DoctorAnalyzer = ({ useremail, onClose }) => {
             </div>
 
             {/* Alerts */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+            {/* <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="font-semibold text-gray-900 flex items-center">
                   <Bell className="h-4 w-4 mr-2 text-red-500" />
@@ -934,10 +941,10 @@ const DoctorAnalyzer = ({ useremail, onClose }) => {
                   </div>
                 )}
               </div>
-            </div>
+            </div> */}
 
             {/* Recommendations */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+            {/* <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
               <h3 className="font-semibold text-gray-900 mb-3 flex items-center">
                 <Target className="h-4 w-4 mr-2 text-green-500" />
                 Recommendations
@@ -972,7 +979,11 @@ const DoctorAnalyzer = ({ useremail, onClose }) => {
                   </div>
                 )}
               </div>
-            </div>
+            </div> */}
+            <RiskPieChart
+        totalPatients={analysisData?.overview?.totalPatients || 0}
+        highRiskPatients={analysisData?.overview?.highRiskPatients || 0}
+      />
           </div>
         </div>
       </div>
