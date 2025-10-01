@@ -348,6 +348,19 @@ const PatientManager = ({ isOpen, onClose, onPatientAdded }) => {
                   placeholder="Enter zipCode"
                 />
               </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Risk Level</label>
+                <select
+                  value={formData.riskLevel}
+                  onChange={(e) => handleInputChange('riskLevel', e.target.value)}
+                  className="w-full text-black px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="Low">Low</option>
+                  <option value="Medium">Medium</option>
+                  <option value="High">High</option>
+                  <option value="Critical">Critical</option>
+                </select>
+              </div>
             </div>
           </div>
 

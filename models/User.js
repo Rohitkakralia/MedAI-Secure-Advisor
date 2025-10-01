@@ -77,7 +77,21 @@ const userSchema = new Schema({
         type: String,
         enum: ['patient', 'doctor', 'admin'],
         default: 'patient'
-    }
+    },
+    // Calendly integration fields
+    calendlyLink:{
+        type: String,
+        default: ""
+    },
+    accessToken: {
+        type: String,
+        default: ""
+    },
+    refreshToken: { 
+        type: String,
+        default: ""
+    },
+    tokenExpiresAt: Date
 }, {
     timestamps: true
 });

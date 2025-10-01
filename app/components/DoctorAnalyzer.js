@@ -686,13 +686,13 @@ const DoctorAnalyzer = ({ useremail, onClose }) => {
                           Age: {patient.age} • {patient.gender}
                         </p>
                       </div>
-                      {/* <div
+                      <div
                         className={`px-2 py-1 rounded-full text-xs font-medium ${getRiskColor(
                           patient.riskLevel
                         )}`}
                       >
                         {patient.riskLevel}
-                      </div> */}
+                      </div>
                     </div>
                     <div className="mt-2 flex items-center text-xs text-gray-500">
                       <Calendar className="h-3 w-3 mr-1" />

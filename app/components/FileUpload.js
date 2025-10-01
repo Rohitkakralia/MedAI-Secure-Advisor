@@ -1,11 +1,15 @@
 import { useState, useEffect, useRef } from "react";
 import { fetchUser, fetchRole } from "../actions/fetchDetails";
 import { fetchUploads } from "../actions/fetchDetails";
+import { useSession } from "next-auth/react";
 import { Sparkles, Plus, Stethoscope, Heart, BarChart3 } from "lucide-react";
 import Chatbot from "./chatbot";
 import DoctorAnalyzer from "./DoctorAnalyzer";
 
 export default function FileUpload({ useremail }) {
+
+  const { data: session, status } = useSession();
+
   const [file, setFile] = useState(null);
   const [patientName, setPatientName] = useState("");
   const [patientAge, setPatientAge] = useState("");
@@ -29,25 +33,56 @@ export default function FileUpload({ useremail }) {
   const [isHovered, setIsHovered] = useState(false);
   const fileInputRef = useRef(null); // Reference to the file input element
 
+  //setShowCalendlyPopup
+  const [showCalendlyPopup, setShowCalendlyPopup] = useState(false);
+
+
   // Extract username from useremail (part before @ symbol)
   const userEmail = useremail ? useremail : "";
-  console.log("User userEmail:", userEmail);
+  console.log("User userEmail1:", userEmail);
+ 
+
+
+  const handleConnect = () => {
+    const clientId = process.env.NEXT_PUBLIC_CALENDLY_CLIENT_ID;
+    const redirectUri = process.env.NEXT_PUBLIC_CALENDLY_REDIRECT_URI;
+
+    const url = `https://auth.calendly.com/oauth/authorize?client_id=${clientId}&response_type=code&redirect_uri=${redirectUri}`;
+    window.location.href = url;
+  };
   
   // Function to fetch upload history from your backend (MongoDB)
-  const getData = async () => {
-    let u = await fetchUser(useremail);
-    let images = await fetchUploads(u);
-    const rol = await fetchRole(userEmail);
-    setRole(rol.role);
-    console.log("Role", rol);
-    setUploadHistory(images);
-    console.log("Image", images);
-    setFilteredHistory(images); // Initialize filtered history with all images
-  };
-
+  
+  
   useEffect(() => {
-    getData();
-  }, []);
+    if (status === "authenticated" && session?.user?.email) {
+      const getData = async () => {
+        try {
+          const userEmail = session.user.email;
+          console.log("User userEmail2:", userEmail);
+          const user = await fetchUser(userEmail);
+          const images = await fetchUploads(user);
+          const rol = await fetchRole(userEmail);
+  
+          setRole(rol.role);
+          setUploadHistory(images);
+          setFilteredHistory(images);
+
+          if (
+            rol.role === "doctor" &&
+            (user?.calendlyLink)
+          ) {
+            setShowCalendlyPopup(true); // show modal
+          }
+
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
+      };
+  
+      getData();
+    }
+  }, [status, session]);
 
   // Search function to filter the upload history
   const handleSearch = (query, filter) => {
@@ -328,6 +363,60 @@ export default function FileUpload({ useremail }) {
 
   return (
     <div className=" min-h-screen py-6">
+
+      {/* Calendly Connect Box (Top Right) */}
+      {showCalendlyPopup && (
+  <div className="fixed top-4 right-4 z-50">
+    <div className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-6 py-6 rounded-2xl shadow-2xl flex items-start gap-4 relative border border-blue-300 w-80 min-h-[160px]">
+      
+      {/* Cross Button */}
+      <button
+        onClick={() => setShowCalendlyPopup(false)}
+        className="absolute -top-3 -right-3 bg-white text-gray-600 rounded-full w-8 h-8 flex items-center justify-center shadow hover:bg-gray-100 transition"
+      >
+        ×
+      </button>
+
+      {/* Icon */}
+      <div className="bg-white text-blue-600 rounded-full p-3 shadow-md mt-1">
+        <svg xmlns="http://www.w3.org/2000/svg"
+             className="h-7 w-7"
+             fill="none"
+             viewBox="0 0 24 24"
+             stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2v-7a2 2 0 00-2-2H5a2 2 0 00-2 2v7a2 2 0 002 2z" />
+        </svg>
+      </div>
+
+      {/* Text + Buttons */}
+      <div className="flex-1">
+        <h2 className="text-lg font-bold">Connect Calendly</h2>
+        <p className="text-sm text-blue-100 mt-1 mb-4">
+          Connect Calendly to start using the appointment feature and manage your schedules easily.
+        </p>
+        
+        <div className="flex gap-2">
+          <button
+            onClick={handleConnect}
+            className="bg-white text-blue-600 font-medium ml-[-20px] px-3 py-1.5 rounded-lg shadow hover:bg-gray-100 transition"
+          >
+            Connect
+          </button>
+          <button
+            onClick={() => setShowCalendlyPopup(false)}
+            className="bg-transparent border border-white text-white font-medium px-3 py-1.5 rounded-lg hover:bg-white hover:text-blue-600 transition"
+          >
+            Skip this time
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+
+
+
       <div className="max-w-6xl mx-auto px-4">
         <h1 className="text-2xl font-bold text-center mb-8 text-gray-800">
           Medical Record Management

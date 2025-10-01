@@ -8,6 +8,14 @@ import Link from 'next/link'
 const Page = () => {
   const { data: session, status } = useSession()
   const router = useRouter()
+
+  const handleConnect = () => {
+    const clientId = process.env.NEXT_PUBLIC_CALENDLY_CLIENT_ID;
+    const redirectUri = process.env.NEXT_PUBLIC_CALENDLY_REDIRECT_URI;
+
+    const url = `https://auth.calendly.com/oauth/authorize?client_id=${clientId}&response_type=code&redirect_uri=${redirectUri}`;
+    window.location.href = url;
+  };
   
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -87,6 +95,13 @@ const Page = () => {
                   <span className="text-gray-300">|</span>
                   <button className="text-gray-600 hover:text-blue-600 font-medium">
                     Sign Out
+                  </button>
+                  <span className="text-gray-300">|</span>
+                  <button
+                    onClick={handleConnect}
+                      className="text-gray-600 hover:text-blue-600 font-medium"
+                    >
+                        Connect Calendly
                   </button>
                 </div>
               </div>

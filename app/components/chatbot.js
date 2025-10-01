@@ -21,6 +21,7 @@ const Chatbot = ({ useremail, onClose}) => {
   const [isResizing, setIsResizing] = useState(false);
   const [resizeType, setResizeType] = useState('');
   const [isMaximized, setIsMaximized] = useState(false);
+  const [calendly_Link, setCalendlyLink] = useState(null);
   const containerRef = useRef(null);
   const startPosRef = useRef({ x: 0, y: 0 });
   const startDimensionsRef = useRef({ width: 0, height: 0 });
@@ -29,13 +30,35 @@ const Chatbot = ({ useremail, onClose}) => {
   const CHAT_STORAGE_KEY = `chat_messages_${useremail || 'anonymous'}`;
 
   const [open, setOpen] = useState(false);
-  function bookAppointment(email) {
-    setOpen(true);
+  async function bookAppointment(email) {
+    //call an API at api/appointments/book to get calendlyLink from user schema with email of doctor
+
+    const Email = "med.ai.appointments@gmail.com";
+
+  const response = await fetch('/api/getCalendlyLink', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ email: Email }),
+  });
+
+  if (!response.ok) {
+    console.error("Failed to fetch calendly link:", response.statusText);
+    return;
   }
+
+  const data = await response.json();
+  console.log("calendlyLink of doctor from DB", data);
+
+  setCalendlyLink(data.calendlyLink);
+  setOpen(true);
+  }
+
   function handleClose() {
     setOpen(false);
   }
-  const calendlyLink = "CALENDLY_LINK"; // Replace with your event link
+  const calendlyLink = calendly_Link; // Replace with your event link
 
   // Resize handlers
   const handleMouseDown = (e, type) => {
@@ -665,14 +688,14 @@ Format your response in a clear, structured manner with proper sections and bull
 
                     <button
                       className="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg text-sm font-medium flex items-center justify-center transition-colors"
-                      onClick={() => bookAppointment(doctor.email)}
+                      onClick={() => bookAppointment("med.ai.appointments@gmail.com")}
                     >
                       <span>Book Appointment</span>
                       <ExternalLink className="h-3 w-3 ml-2" />
                     </button>
                     <CalendlyPopup
                       url={calendlyLink}
-                      email={doctor.email}
+                      email="med.ai.appointments@gmail.com"
                       open={open}
                       onClose={handleClose}
                     />
@@ -722,9 +745,9 @@ const copyEmail = async (email) => {
       className="flex bg-gradient-to-br from-blue-50 via-white to-indigo-50 relative shadow-2xl border border-gray-300 rounded-lg overflow-hidden select-none"
       style={{ 
         width: `${dimensions.width}px`, 
-        height: `${dimensions.height}px`,
-        minWidth: '400px',
-        minHeight: '300px',
+        height: "100vh",
+        minWidth: '600px',
+        minHeight: '400px',
         resize: 'none'
       }}
     >
@@ -790,6 +813,7 @@ const copyEmail = async (email) => {
                 <h1 className="text-xl font-bold text-gray-900">MedChat AI</h1>
                 <p className="text-sm text-gray-500">Medical Document Assistant</p>
               </div>
+              
             </div>
             
           </div>
@@ -802,6 +826,20 @@ const copyEmail = async (email) => {
                 {files.length}
               </span>
             </div>
+
+            {/* <button
+                      className="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg text-sm font-medium flex items-center justify-center transition-colors"
+                      onClick={() => bookAppointment("med.ai.appointments@gmail.com")}
+                    >
+                      <span>Book Appointment</span>
+                      <ExternalLink className="h-3 w-3 ml-2" />
+                    </button>
+                    <CalendlyPopup
+                      url={calendlyLink}
+                      email="med.ai.appointments@gmail.com"
+                      open={open}
+                      onClose={handleClose}
+                    /> */}
 
             <div className="space-y-2 max-h-96 overflow-y-auto">
               {files.length === 0 ? (
