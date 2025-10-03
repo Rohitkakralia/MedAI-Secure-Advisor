@@ -45,7 +45,10 @@ export default function Navbar() {
                   <LayoutDashboard className="h-4 w-4 mr-1" />
               <span>Dashboard</span>
             </Link>
+              
             )}
+           
+
             {session && (
               <Link 
               href="/shared"

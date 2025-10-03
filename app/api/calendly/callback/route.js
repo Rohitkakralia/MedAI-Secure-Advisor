@@ -63,13 +63,13 @@ export async function GET(req) {
     }
 
     console.log("Updating user:", calendlyUser.email);
-console.log("Scheduling URL:", calendlyUser.scheduling_url);
-console.log("Access Token:", tokenData.access_token);
-console.log("Refresh Token:", tokenData.refresh_token);
-console.log("Expires At:", tokenExpiresAt);
+    console.log("Scheduling URL:", calendlyUser.scheduling_url);
+    console.log("Access Token:", tokenData.access_token);
+    console.log("Refresh Token:", tokenData.refresh_token);
+    console.log("Expires At:", tokenExpiresAt);
 
-const existingUser = await User.findOne({ email: calendlyUser.email.trim().toLowerCase() });
-console.log("Existing user in DB:", existingUser);
+    const existingUser = await User.findOne({ email: calendlyUser.email.trim().toLowerCase() });
+    console.log("Existing user in DB:", existingUser);
     // Step 3: Save Calendly data into your User schema
     const user = await User.findOneAndUpdate(
       { email: calendlyUser.email.trim().toLowerCase() },
@@ -91,7 +91,50 @@ console.log("Existing user in DB:", existingUser);
       );
     }
 
-    // Step 4: Redirect back to dashboard
+
+    // Step 4: Register webhook (if not already done)
+    try {
+      // Check existing webhooks first
+      const existingWebhooksRes = await fetch(
+        "https://api.calendly.com/webhook_subscriptions",
+        {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        }
+      );
+      const existingWebhooks = await existingWebhooksRes.json();
+
+      const alreadyRegistered = existingWebhooks.collection?.some(
+        (hook) => hook.url === `${process.env.NEXT_PUBLIC_APP_URL}/api/calendly/webhook`
+      );
+
+      if (!alreadyRegistered) {
+        const webhookRes = await fetch(
+          "https://api.calendly.com/webhook_subscriptions",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${accessToken}`,
+            },
+            body: JSON.stringify({
+              url: `${process.env.NEXT_PUBLIC_APP_URL}/api/calendly/webhook`,
+              events: ["invitee.created", "invitee.canceled"],
+              organization: calendlyUser.current_organization,
+            }),
+          }
+        );
+
+        const webhookData = await webhookRes.json();
+        console.log("✅ Webhook registered:", webhookData);
+      } else {
+        console.log("ℹ️ Webhook already registered, skipping...");
+      }
+    } catch (err) {
+      console.error("⚠️ Failed to register webhook:", err);
+    }
+    
+
+    // Step 5: Redirect back to dashboard
     return NextResponse.redirect(
       `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?calendly=connected`
     );

@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-import { DstAlphaFactor } from 'three';
 const { Schema, model } = mongoose;
 
 const userSchema = new Schema({
@@ -96,4 +95,23 @@ const userSchema = new Schema({
     timestamps: true
 });
 
-export default mongoose.models.User || model('User', userSchema);
+// Handle both cases: mongoose.models might be undefined, and prevent overwrite errors
+let User;
+
+try {
+    // Check if model already exists
+    if (mongoose.models && mongoose.models.User) {
+        User = mongoose.models.User;
+    } else {
+        User = model('User', userSchema);
+    }
+} catch (error) {
+    // If there's an overwrite error, use the existing model
+    if (error.name === 'OverwriteModelError') {
+        User = mongoose.models.User;
+    } else {
+        throw error;
+    }
+}
+
+export default User;

@@ -2,13 +2,17 @@ import { useState, useEffect, useRef } from "react";
 import { fetchUser, fetchRole } from "../actions/fetchDetails";
 import { fetchUploads } from "../actions/fetchDetails";
 import { useSession } from "next-auth/react";
+import { useRouter } from 'next/navigation';
 import { Sparkles, Plus, Stethoscope, Heart, BarChart3 } from "lucide-react";
 import Chatbot from "./chatbot";
 import DoctorAnalyzer from "./DoctorAnalyzer";
+import { getScheduledEvents } from "../actions/getScheduledAppointments";
+import { getEventInviteesByUri } from "../actions/getScheduledAppointments";
 
 export default function FileUpload({ useremail }) {
-
   const { data: session, status } = useSession();
+  const router = useRouter();
+
 
   const [file, setFile] = useState(null);
   const [patientName, setPatientName] = useState("");
@@ -36,12 +40,9 @@ export default function FileUpload({ useremail }) {
   //setShowCalendlyPopup
   const [showCalendlyPopup, setShowCalendlyPopup] = useState(false);
 
-
   // Extract username from useremail (part before @ symbol)
   const userEmail = useremail ? useremail : "";
   console.log("User userEmail1:", userEmail);
- 
-
 
   const handleConnect = () => {
     const clientId = process.env.NEXT_PUBLIC_CALENDLY_CLIENT_ID;
@@ -50,10 +51,9 @@ export default function FileUpload({ useremail }) {
     const url = `https://auth.calendly.com/oauth/authorize?client_id=${clientId}&response_type=code&redirect_uri=${redirectUri}`;
     window.location.href = url;
   };
-  
+
   // Function to fetch upload history from your backend (MongoDB)
-  
-  
+
   useEffect(() => {
     if (status === "authenticated" && session?.user?.email) {
       const getData = async () => {
@@ -63,23 +63,32 @@ export default function FileUpload({ useremail }) {
           const user = await fetchUser(userEmail);
           const images = await fetchUploads(user);
           const rol = await fetchRole(userEmail);
-  
+
           setRole(rol.role);
           setUploadHistory(images);
           setFilteredHistory(images);
 
-          if (
-            rol.role === "doctor" &&
-            (user?.calendlyLink)
-          ) {
-            setShowCalendlyPopup(true); // show modal
+          if (rol.role === "doctor") {
+            const isTokenExpired = user?.tokenExpiresAt 
+              ? new Date(user.tokenExpiresAt) < new Date() 
+              : true;
+            
+            const needsCalendlySetup = !user?.calendlyLink || isTokenExpired;
+            
+            // Check if popup was already shown in this session
+            const popupShown = sessionStorage.getItem(`calendly_popup_shown_${userEmail}`);
+            
+            if (needsCalendlySetup && !popupShown) {
+              setShowCalendlyPopup(true);
+              // Mark as shown for this session
+              sessionStorage.setItem(`calendly_popup_shown_${userEmail}`, 'true');
+            }
           }
-
         } catch (error) {
           console.error("Error fetching data:", error);
         }
       };
-  
+
       getData();
     }
   }, [status, session]);
@@ -362,66 +371,87 @@ export default function FileUpload({ useremail }) {
   };
 
   return (
-    <div className=" min-h-screen py-6">
-
+    <div className=" min-h-screen py-6 flex flex-col items-center">
+      
       {/* Calendly Connect Box (Top Right) */}
       {showCalendlyPopup && (
-  <div className="fixed top-4 right-4 z-50">
-    <div className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-6 py-6 rounded-2xl shadow-2xl flex items-start gap-4 relative border border-blue-300 w-80 min-h-[160px]">
-      
-      {/* Cross Button */}
-      <button
-        onClick={() => setShowCalendlyPopup(false)}
-        className="absolute -top-3 -right-3 bg-white text-gray-600 rounded-full w-8 h-8 flex items-center justify-center shadow hover:bg-gray-100 transition"
-      >
-        ×
-      </button>
+        <div className="fixed top-4 right-4 z-50">
+          <div className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-6 py-6 rounded-2xl shadow-2xl flex items-start gap-4 relative border border-blue-300 w-80 min-h-[160px]">
+            {/* Cross Button */}
+            <button
+              onClick={() => setShowCalendlyPopup(false)}
+              className="absolute -top-3 -right-3 bg-white text-gray-600 rounded-full w-8 h-8 flex items-center justify-center shadow hover:bg-gray-100 transition"
+            >
+              ×
+            </button>
 
-      {/* Icon */}
-      <div className="bg-white text-blue-600 rounded-full p-3 shadow-md mt-1">
-        <svg xmlns="http://www.w3.org/2000/svg"
-             className="h-7 w-7"
-             fill="none"
-             viewBox="0 0 24 24"
-             stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2v-7a2 2 0 00-2-2H5a2 2 0 00-2 2v7a2 2 0 002 2z" />
-        </svg>
-      </div>
+            {/* Icon */}
+            <div className="bg-white text-blue-600 rounded-full p-3 shadow-md mt-1">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-7 w-7"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2v-7a2 2 0 00-2-2H5a2 2 0 00-2 2v7a2 2 0 002 2z"
+                />
+              </svg>
+            </div>
 
-      {/* Text + Buttons */}
-      <div className="flex-1">
-        <h2 className="text-lg font-bold">Connect Calendly</h2>
-        <p className="text-sm text-blue-100 mt-1 mb-4">
-          Connect Calendly to start using the appointment feature and manage your schedules easily.
-        </p>
-        
-        <div className="flex gap-2">
-          <button
-            onClick={handleConnect}
-            className="bg-white text-blue-600 font-medium ml-[-20px] px-3 py-1.5 rounded-lg shadow hover:bg-gray-100 transition"
-          >
-            Connect
-          </button>
-          <button
-            onClick={() => setShowCalendlyPopup(false)}
-            className="bg-transparent border border-white text-white font-medium px-3 py-1.5 rounded-lg hover:bg-white hover:text-blue-600 transition"
-          >
-            Skip this time
-          </button>
+            {/* Text + Buttons */}
+            <div className="flex-1">
+              <h2 className="text-lg font-bold">Connect Calendly</h2>
+              <p className="text-sm text-blue-100 mt-1 mb-4">
+                Connect Calendly to start using the appointment feature and
+                manage your schedules easily.
+              </p>
+
+              <div className="flex gap-2">
+                <button
+                  onClick={handleConnect}
+                  className="bg-white text-blue-600 font-medium ml-[-20px] px-3 py-1.5 rounded-lg shadow hover:bg-gray-100 transition"
+                >
+                  Connect
+                </button>
+                <button
+                  onClick={() => setShowCalendlyPopup(false)}
+                  className="bg-transparent border border-white text-white font-medium px-3 py-1.5 rounded-lg hover:bg-white hover:text-blue-600 transition"
+                >
+                  Skip this time
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
-  </div>
-)}
-
-
+      )}
 
       <div className="max-w-6xl mx-auto px-4">
         <h1 className="text-2xl font-bold text-center mb-8 text-gray-800">
           Medical Record Management
         </h1>
 
+        {role === "doctor" && (
+          <div className="bg-gradient-to-br from-blue-600  to-blue-500 rounded-xl p-6 mb-8">
+          <div className="flex items-center gap-2 mb-4">
+            <h3 className="text-xl font-semibold text-white">Appointments</h3>
+          </div>
+          <p className="text-white/80 text-sm mb-4">
+            View and manage your scheduled appointments
+          </p>
+          <button
+            onClick={() => router.push("/appointments")}
+            className="w-full bg-white text-blue-600 font-semibold py-3 px-4 rounded-lg hover:bg-blue-50 transition-all"
+          >
+            Check Appointments →
+          </button>
+        </div>
+  
+        )}
         <div className="grid grid-cols-1 lg:grid-row-2 gap-6">
           {/* Upload Section */}
           <div className="flex flex-col-reverse md:flex-row gap-6">
@@ -1543,114 +1573,116 @@ export default function FileUpload({ useremail }) {
       </div>
 
       {/*chatbot button */}
-      {role==="patient" && (
-      <div className="fixed bottom-4 right-4 z-[9999] flex items-end flex-col gap-2">
-        {/* Animated text */}
-        {!openAI && (
-          <div
-            className={`bg-white/90 backdrop-blur-sm px-3 py-2 rounded-lg shadow-md transition-all duration-300 transform ${
-              isHovered
-                ? "opacity-100 translate-x-0"
-                : "opacity-0 translate-x-2"
-            }`}
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-          >
-            <div className="text-sm font-medium text-gray-800 flex items-center">
-              <span className="mr-1">Start your chat with</span>
-              <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-teal-500">
-                MedChat AI
-              </span>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="ml-1 animate-bounce"
-              >
-                <path d="M5 12h14"></path>
-                <path d="M12 5l7 7-7 7"></path>
-              </svg>
+      {role === "patient" && (
+        <div className="fixed bottom-4 right-4 z-[9999] flex items-end flex-col gap-2">
+          {/* Animated text */}
+          {!openAI && (
+            <div
+              className={`bg-white/90 backdrop-blur-sm px-3 py-2 rounded-lg shadow-md transition-all duration-300 transform ${
+                isHovered
+                  ? "opacity-100 translate-x-0"
+                  : "opacity-0 translate-x-2"
+              }`}
+              onMouseEnter={() => setIsHovered(true)}
+              onMouseLeave={() => setIsHovered(false)}
+            >
+              <div className="text-sm font-medium text-gray-800 flex items-center">
+                <span className="mr-1">Start your chat with</span>
+                <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-teal-500">
+                  MedChat AI
+                </span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="ml-1 animate-bounce"
+                >
+                  <path d="M5 12h14"></path>
+                  <path d="M12 5l7 7-7 7"></path>
+                </svg>
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {!openAI ? (
-          <div className="relative">
-            {/* Pulse animation rings */}
-            <div className="absolute inset-0 animate-ping">
-              <div className="w-16 h-16 rounded-full bg-blue-400 opacity-20"></div>
-            </div>
-            <div className="absolute inset-0 animate-pulse delay-75">
-              <div className="w-16 h-16 rounded-full bg-teal-400 opacity-15"></div>
-            </div>
+          {!openAI ? (
+            <div className="relative">
+              {/* Pulse animation rings */}
+              <div className="absolute inset-0 animate-ping">
+                <div className="w-16 h-16 rounded-full bg-blue-400 opacity-20"></div>
+              </div>
+              <div className="absolute inset-0 animate-pulse delay-75">
+                <div className="w-16 h-16 rounded-full bg-teal-400 opacity-15"></div>
+              </div>
 
-            {/* Main button */}
-            <button
-              className={`
+              {/* Main button */}
+              <button
+                className={`
           relative w-16 h-16 rounded-full shadow-2xl transition-all duration-300 transform
           bg-gradient-to-br from-blue-500 via-blue-600 to-teal-500
           hover:from-blue-600 hover:via-blue-700 hover:to-teal-600
           ${isHovered ? "scale-110" : "scale-100"}
           group overflow-hidden
         `}
-              onClick={() => setOpenAI(true)}
-              onMouseEnter={() => setIsHovered(true)}
-              onMouseLeave={() => setIsHovered(false)}
-            >
-              {/* Background gradient overlay */}
-              <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-50"></div>
+                onClick={() => setOpenAI(true)}
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+              >
+                {/* Background gradient overlay */}
+                <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-50"></div>
 
-              {/* Sparkle effects */}
-              <div className="absolute top-2 right-2">
-                <Sparkles
-                  size={8}
-                  className="text-white/60 animate-pulse"
-                  style={{ animationDelay: "0.5s" }}
-                />
-              </div>
-              <div className="absolute bottom-3 left-2">
-                <Sparkles
-                  size={6}
-                  className="text-white/40 animate-pulse"
-                  style={{ animationDelay: "1s" }}
-                />
-              </div>
-
-              {/* Medical cross background */}
-              <div className="absolute inset-0 flex items-center justify-center opacity-10">
-                <Plus size={32} className="text-white" />
-              </div>
-
-              {/* Main icons */}
-              <div className="relative z-10 w-full h-full flex items-center justify-center">
-                <div className="relative">
-                  {/* Stethoscope icon */}
-                  <Stethoscope
-                    size={18}
-                    className={`text-white transition-all duration-300 ${
-                      isHovered ? "transform -translate-y-1" : ""
-                    }`}
-                  />
-
-                  {/* Heart icon that appears on hover */}
-                  <Heart
-                    size={10}
-                    className={`absolute -bottom-1 -right-1 text-red-300 transition-all duration-300 ${
-                      isHovered ? "opacity-100 scale-100" : "opacity-0 scale-50"
-                    }`}
+                {/* Sparkle effects */}
+                <div className="absolute top-2 right-2">
+                  <Sparkles
+                    size={8}
+                    className="text-white/60 animate-pulse"
+                    style={{ animationDelay: "0.5s" }}
                   />
                 </div>
-              </div>
+                <div className="absolute bottom-3 left-2">
+                  <Sparkles
+                    size={6}
+                    className="text-white/40 animate-pulse"
+                    style={{ animationDelay: "1s" }}
+                  />
+                </div>
 
-              {/* Tooltip */}
-              <div
-                className={`
+                {/* Medical cross background */}
+                <div className="absolute inset-0 flex items-center justify-center opacity-10">
+                  <Plus size={32} className="text-white" />
+                </div>
+
+                {/* Main icons */}
+                <div className="relative z-10 w-full h-full flex items-center justify-center">
+                  <div className="relative">
+                    {/* Stethoscope icon */}
+                    <Stethoscope
+                      size={18}
+                      className={`text-white transition-all duration-300 ${
+                        isHovered ? "transform -translate-y-1" : ""
+                      }`}
+                    />
+
+                    {/* Heart icon that appears on hover */}
+                    <Heart
+                      size={10}
+                      className={`absolute -bottom-1 -right-1 text-red-300 transition-all duration-300 ${
+                        isHovered
+                          ? "opacity-100 scale-100"
+                          : "opacity-0 scale-50"
+                      }`}
+                    />
+                  </div>
+                </div>
+
+                {/* Tooltip */}
+                <div
+                  className={`
             absolute bottom-full right-0 mb-2 px-3 py-1 bg-gray-900 text-white text-xs 
             rounded-lg whitespace-nowrap transition-all duration-200 pointer-events-none
             ${
@@ -1659,30 +1691,33 @@ export default function FileUpload({ useremail }) {
                 : "opacity-0 translate-y-1"
             }
           `}
-              >
-                Ask your health questions
-                <div className="absolute top-full right-3 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
+                >
+                  Ask your health questions
+                  <div className="absolute top-full right-3 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
+                </div>
+              </button>
+
+              {/* Floating medical icons */}
+              <div className="absolute -top-2 -left-2 w-4 h-4 bg-red-100 rounded-full flex items-center justify-center animate-bounce">
+                <Heart size={8} className="text-red-500" />
               </div>
-            </button>
 
-            {/* Floating medical icons */}
-            <div className="absolute -top-2 -left-2 w-4 h-4 bg-red-100 rounded-full flex items-center justify-center animate-bounce">
-              <Heart size={8} className="text-red-500" />
+              {/* Status indicator */}
+              <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
+                <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+              </div>
             </div>
-
-            {/* Status indicator */}
-            <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
-              <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+          ) : (
+            <div className="fixed inset-0 flex items-center justify-center bg-black/20 backdrop-blur-sm z-50 p-8 overflow-hidden">
+              <div className="animate-in slide-in-from-bottom-5 fade-in-0 duration-300 w-full h-full flex items-center justify-center">
+                <Chatbot
+                  useremail={userEmail}
+                  onClose={() => setOpenAI(false)}
+                />
+              </div>
             </div>
-          </div>
-        ) : (
-          <div className="fixed inset-0 flex items-center justify-center bg-black/20 backdrop-blur-sm z-50 p-8 overflow-hidden">
-            <div className="animate-in slide-in-from-bottom-5 fade-in-0 duration-300 w-full h-full flex items-center justify-center">
-              <Chatbot useremail={userEmail} onClose={() => setOpenAI(false)} />
-            </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
       )}
 
       {/* Doctor Analyzer button */}
@@ -1785,7 +1820,9 @@ export default function FileUpload({ useremail }) {
                     <Stethoscope
                       size={10}
                       className={`absolute -bottom-1 -right-1 text-blue-300 transition-all duration-300 ${
-                        isHovered ? "opacity-100 scale-100" : "opacity-0 scale-50"
+                        isHovered
+                          ? "opacity-100 scale-100"
+                          : "opacity-0 scale-50"
                       }`}
                     />
                   </div>
@@ -1820,13 +1857,15 @@ export default function FileUpload({ useremail }) {
             </div>
           ) : (
             <div className="animate-in slide-in-from-bottom-5 fade-in-0 duration-300">
-              <DoctorAnalyzer useremail={userEmail} onClose={() => setOpenAnalyzer(false)} />
+              <DoctorAnalyzer
+                useremail={userEmail}
+                onClose={() => setOpenAnalyzer(false)}
+              />
             </div>
           )}
         </div>
       )}
     </div>
-
   );
 }
 

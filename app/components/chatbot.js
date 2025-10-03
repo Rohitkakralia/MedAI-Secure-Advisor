@@ -11,6 +11,8 @@ const Chatbot = ({ useremail, onClose}) => {
   const router = useRouter();
   const [files, setFiles] = useState([]);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [selectedFiles, setSelectedFiles] = useState([]); // for compare mode (max 2)
+  const [compareMode, setCompareMode] = useState(false);
   const [pdfToParse, setPdfToParse] = useState(null);
   const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -436,6 +438,80 @@ Format your response in a clear, structured manner with proper sections and bull
     }
   };
 
+  const handleCompare = async () => {
+    try {
+      if (selectedFiles.length !== 2) return;
+      setIsLoading(true);
+
+      // Add user message
+      addMessage({ sender: "user", text: "Please compare the selected two documents and suggest improvements." });
+
+      // Decrypt both files
+      const [fileIdA, fileIdB] = selectedFiles;
+
+      const [hashA, ivA, hashB, ivB] = await Promise.all([
+        fetchHash(fileIdA),
+        fetchIv(fileIdA),
+        fetchHash(fileIdB),
+        fetchIv(fileIdB),
+      ]);
+
+      if (!hashA || !ivA || !hashB || !ivB) {
+        throw new Error("Failed to fetch decryption parameters for both files");
+      }
+
+      const [pdfA, pdfB] = await Promise.all([
+        decryptImage(hashA, ivA, "application/pdf"),
+        decryptImage(hashB, ivB, "application/pdf"),
+      ]);
+
+      if (!pdfA || !pdfB || pdfA.size === 0 || pdfB.size === 0) {
+        throw new Error("Decrypted files are empty or invalid");
+      }
+
+      const [base64A, base64B] = await Promise.all([
+        fileToBase64(new File([pdfA], "docA.pdf", { type: "application/pdf" })),
+        fileToBase64(new File([pdfB], "docB.pdf", { type: "application/pdf" })),
+      ]);
+
+      const comparePrompt = "compare these two file and tell me inprovements";
+
+      const contents = [
+        {
+          role: "user",
+          parts: [
+            { text: comparePrompt },
+            {
+              inlineData: { mimeType: "application/pdf", data: base64A },
+            },
+            {
+              inlineData: { mimeType: "application/pdf", data: base64B },
+            },
+          ],
+        },
+      ];
+
+      const response = await ai.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents,
+      });
+
+      let responseText = "";
+      if (response?.candidates?.[0]?.content?.parts?.[0]?.text) {
+        responseText = response.candidates[0].content.parts[0].text;
+      } else {
+        throw new Error("Could not extract text from Gemini response");
+      }
+
+      addMessage({ sender: "bot", text: responseText });
+    } catch (error) {
+      console.error("Error comparing files:", error);
+      addMessage({ sender: "bot", text: `Error: ${error.message}` });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const getFileName = (file) => {
     return file.fileName || file.filename || file.originalName || file.file_name || file.title || file.document_name || file.uploadName || 'Unknown Document';
   };
@@ -819,6 +895,30 @@ const copyEmail = async (email) => {
           </div>
 
           <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <button
+                onClick={() => {
+                  // toggle compare mode and reset selections appropriately
+                  setCompareMode((prev) => {
+                    const next = !prev;
+                    if (next) {
+                      setSelectedFile(null);
+                    } else {
+                      setSelectedFiles([]);
+                    }
+                    return next;
+                  });
+                }}
+                className={`px-3 py-2 rounded-lg text-xs font-medium border transition-colors ${
+                  compareMode
+                    ? "bg-purple-600 text-white border-purple-700 hover:bg-purple-700"
+                    : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
+                }`}
+                title="Enable selecting two files to compare"
+              >
+                {compareMode ? "Comparing: select 2 files" : "Enable Compare Mode"}
+              </button>
+            </div>
             <div className="flex items-center space-x-2">
               <FileText className="h-5 w-5 text-gray-600" />
               <h2 className="font-semibold text-gray-900">Your Documents</h2>
@@ -851,7 +951,8 @@ const copyEmail = async (email) => {
                 files.map((file, index) => {
                   const fileId = getFileId(file, index);
                   const fileName = getFileName(file);
-                  const isSelected = selectedFile === fileId;
+                  const isSelected =
+                    selectedFile === fileId || selectedFiles.includes(fileId);
                   
                   return (
                     <div
@@ -861,7 +962,22 @@ const copyEmail = async (email) => {
                           ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg"
                           : "bg-gray-50 hover:bg-gray-100 border border-gray-200 hover:border-blue-300"
                       }`}
-                      onClick={() => setSelectedFile(fileId)}
+                      onClick={() => {
+                        if (compareMode) {
+                          setSelectedFiles((prev) => {
+                            // toggle selection; limit to 2
+                            if (prev.includes(fileId)) {
+                              return prev.filter((id) => id !== fileId);
+                            }
+                            if (prev.length >= 2) {
+                              return prev; // ignore if already 2 selected
+                            }
+                            return [...prev, fileId];
+                          });
+                        } else {
+                          setSelectedFile(fileId);
+                        }
+                      }}
                     >
                       <div className="flex items-start space-x-3">
                         <div className={`p-2 rounded-lg ${
@@ -894,7 +1010,28 @@ const copyEmail = async (email) => {
             </div>
           </div>
 
-          {selectedFile && (
+          {compareMode && selectedFiles.length > 0 && (
+            <div className="mt-6 p-4 bg-purple-50 border border-purple-200 rounded-xl">
+              <div className="flex items-center space-x-2">
+                <div className="h-2 w-2 bg-purple-500 rounded-full"></div>
+                <span className="text-sm text-purple-800 font-medium">
+                  {selectedFiles.length === 2
+                    ? "Ready to compare"
+                    : "Select one more file to compare"}
+                </span>
+              </div>
+              <p className="text-xs text-purple-700 mt-1">
+                Selected: {selectedFiles
+                  .map((selId) => {
+                    const idx = files.findIndex((f, i) => getFileId(f, i) === selId);
+                    return getFileName(files[idx] || {});
+                  })
+                  .join(" vs ")}
+              </p>
+            </div>
+          )}
+
+          {!compareMode && selectedFile && (
             <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-xl">
               <div className="flex items-center space-x-2">
                 <div className="h-2 w-2 bg-green-500 rounded-full"></div>
@@ -917,7 +1054,18 @@ const copyEmail = async (email) => {
               <div>
                 <h3 className="font-semibold text-gray-900">Chat Assistant</h3>
                 <p className="text-sm text-gray-500">
-                  {selectedFile ? `Analyzing: ${getFileName(files.find((f, idx) => getFileId(f, idx) === selectedFile) || {})}` : "Select a document to begin"}
+                  {compareMode
+                    ? selectedFiles.length === 2
+                      ? `Comparing: ${(() => {
+                          const [a, b] = selectedFiles;
+                          const ai = files.find((f, idx) => getFileId(f, idx) === a);
+                          const bi = files.find((f, idx) => getFileId(f, idx) === b);
+                          return `${getFileName(ai || {})} vs ${getFileName(bi || {})}`;
+                        })()}`
+                      : "Select two documents to compare"
+                    : selectedFile
+                    ? `Analyzing: ${getFileName(files.find((f, idx) => getFileId(f, idx) === selectedFile) || {})}`
+                    : "Select a document to begin"}
                 </p>
               </div>
             </div>
@@ -1097,7 +1245,33 @@ const copyEmail = async (email) => {
           )}
 
           <div className="space-y-4">
-            {selectedFile && !isLoading && (
+            {compareMode && selectedFiles.length === 2 && !isLoading && (
+              <div className="text-center">
+                <button
+                  type="button"
+                  onClick={handleCompare}
+                  disabled={isLoading}
+                  className="px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-2xl hover:from-purple-700 hover:to-pink-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl text-lg font-semibold"
+                >
+                  {isLoading ? (
+                    <div className="flex items-center space-x-2">
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                      <span>Comparing Documents...</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center space-x-2">
+                      <Stethoscope className="h-5 w-5" />
+                      <span>Compare Two Files</span>
+                    </div>
+                  )}
+                </button>
+                <p className="text-sm text-gray-500 mt-3">
+                  Click to compare the two selected documents and get improvement suggestions
+                </p>
+              </div>
+            )}
+
+            {!compareMode && selectedFile && !isLoading && (
               <div className="text-center">
                 <button
                   type="button"
@@ -1124,7 +1298,7 @@ const copyEmail = async (email) => {
               </div>
             )}
 
-            {!selectedFile && (
+            {!compareMode && !selectedFile && (
               <div className="text-center py-8">
                 <FileText className="h-16 w-16 text-gray-300 mx-auto mb-4" />
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">Select a Document First</h3>

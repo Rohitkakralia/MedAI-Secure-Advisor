@@ -34,7 +34,7 @@ const UserDashboard = () => {
       backgroundPosition: "center"
     }}
   >
-      <h1>Welcome, {session?.user?.email.split('@')[0]}!</h1>
+      {/* <h1>Welcome, {session?.user?.email.split('@')[0]}!</h1> */}
       <FileUpload useremail={session?.user?.email} />
       
     </div>

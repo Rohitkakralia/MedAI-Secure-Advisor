@@ -1,10 +1,9 @@
 import connectDB from '@/db/connectDb';
 import User from '@/models/User';
 
-// Connect to database once
-connectDB();
-
 export async function PUT(req) {
+    // Connect to database
+    await connectDB();
     try {
       // Parse request body
       const body = await req.json();
