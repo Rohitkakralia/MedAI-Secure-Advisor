@@ -480,4 +480,59 @@ PatientSchema.pre('save', function(next) {
   next();
 });
 
+
+PatientSchema.statics.getVitalHistory = async function(patientId, timeRange = '30days') {
+  const dateFilter = {};
+  const now = new Date();
+  
+  switch (timeRange) {
+    case '7days':
+      dateFilter.$gte = new Date(now.setDate(now.getDate() - 7));
+      break;
+    case '90days':
+      dateFilter.$gte = new Date(now.setDate(now.getDate() - 90));
+      break;
+    default:
+      dateFilter.$gte = new Date(now.setDate(now.getDate() - 30));
+  }
+
+  return this.aggregate([
+    { $match: { _id: mongoose.Types.ObjectId(patientId) } },
+    { $unwind: '$treatmentHistory' },
+    { $match: { 'treatmentHistory.date': dateFilter } },
+    { $sort: { 'treatmentHistory.date': 1 } },
+    {
+      $group: {
+        _id: '$_id',
+        bloodPressure: {
+          $push: {
+            date: '$treatmentHistory.date',
+            systolic: '$treatmentHistory.vitalSigns.bloodPressure.systolic',
+            diastolic: '$treatmentHistory.vitalSigns.bloodPressure.diastolic'
+          }
+        },
+        heartRate: {
+          $push: {
+            date: '$treatmentHistory.date',
+            value: '$treatmentHistory.vitalSigns.heartRate.value'
+          }
+        },
+        weight: {
+          $push: {
+            date: '$treatmentHistory.date',
+            value: '$treatmentHistory.vitalSigns.weight.value'
+          }
+        },
+        temperature: {
+          $push: {
+            date: '$treatmentHistory.date',
+            value: '$treatmentHistory.vitalSigns.temperature.value'
+          }
+        }
+      }
+    }
+  ]);
+};
+
+
 export default mongoose.models.Patient || mongoose.model('Patient', PatientSchema);

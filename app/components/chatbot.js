@@ -444,7 +444,55 @@ Format your response in a clear, structured manner with proper sections and bull
       setIsLoading(true);
 
       // Add user message
-      addMessage({ sender: "user", text: "Please compare the selected two documents and suggest improvements." });
+      addMessage({
+        sender: "user",
+        text: `
+      Compare the following two clinical reports in a structured and detailed manner.
+      Identify similarities and differences across all key medical sections.
+      Present the results in a clear, organized format.
+      
+      Instructions:
+      1. Analyze both reports section by section.
+      2. Highlight differences in terminology, measurements, and findings.
+      3. Focus only on medically relevant information — ignore layout or formatting differences.
+      
+      Output the comparison using the following structure:
+      
+      {
+        "Patient Information": {
+          "Similarities": "",
+          "Differences": ""
+        },
+        "Diagnosis": {
+          "Similarities": "",
+          "Differences": ""
+        },
+        "Clinical Findings": {
+          "Similarities": "",
+          "Differences": ""
+        },
+        "Lab Results": {
+          "Similarities": "",
+          "Differences": ""
+        },
+        "Medications / Treatment Plan": {
+          "Similarities": "",
+          "Differences": ""
+        },
+        "Impressions / Comments": {
+          "Similarities": "",
+          "Differences": ""
+        },
+        "Overall Summary": {
+          "Key Differences Summary": "",
+          "Potential Clinical Impact": ""
+        }
+      }
+      
+      
+      `
+      });
+      
 
       // Decrypt both files
       const [fileIdA, fileIdB] = selectedFiles;

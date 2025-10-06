@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import PatientAnalyzer from "./PatientAnalyzer";
 import RiskPieChart from "./RiskPieChart";
 
 import {
@@ -853,6 +854,9 @@ const DoctorAnalyzer = ({ useremail, onClose }) => {
                     )}
                   </div>
                 </div>
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <PatientAnalyzer patient={selectedPatient} />
+    </div>
               </>
             ) : (
               <div className="h-full flex items-center justify-center">

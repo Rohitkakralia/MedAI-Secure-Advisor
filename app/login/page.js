@@ -41,7 +41,7 @@ const LoginPage = () => {
           {/* Login methods */}
           <div className="space-y-4">
             <button
-              onClick={() => signIn("google")}
+              onClick={() =>  signIn('google')}
               className="flex items-center justify-center w-full bg-white hover:bg-gray-50 border border-gray-300 rounded-lg py-3 px-4 text-gray-800 font-medium transition duration-150 ease-in-out shadow-sm"
             >
               <svg
